@@ -1,0 +1,21 @@
+0. Get program back to running normally and ready for new development.
+
+a. Fix SQL Queries (Done)
+
+b. Troubleshoot Code (Incomplete)
+	
+	a. Fix transactions by adding a way to choose logical accounts in some way. (Incomplete)
+
+	b. Test all features to see function normally.
+
+c. Polish code if practical
+
+1. Develop Improvements to the main page one at a time and test them before moving onto the next feature.
+
+a. Develop Improved Account Creator
+
+2. Follow the same process on the Budgeting UI Page.
+
+3. Improve Error Trapping
+
+4. Analyze the results, make new plans for a new iteration and repeat steps 1 and 2 if needed. Otherwise, the job is complete.

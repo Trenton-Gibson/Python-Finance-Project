@@ -1,0 +1,2 @@
+Have the ability to create **budgets** in the finance manager that allocates **income** automatically to all **accounts** based on if the **budget** has a specific **account** and the desired **amount** for that **account** within the **budget**. Additionally, a **feature** should be added that allows for **subaccounts** to be created from **real** **accounts** so that the money in the **real accounts** can be divided in accordance with the corresponding **budget**, but also allows for the total **amount** of **money** in the **real account** to be easily checked.
+
