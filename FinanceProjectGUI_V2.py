@@ -200,6 +200,10 @@ class FinanceGUI:
 		## Pack and configure the scrollbar for the Accounts Treeview
 		self.AccountsInfoTreeview.grid()
 		self.Accounts_yscroll.config(command=self.AccountsInfoTreeview.yview)
+		row=("k","k","k","k","k")
+		id2=self.AccountsInfoTreeview.insert("", tk.END, values=row)
+		self.AccountsInfoTreeview.insert(id2, tk.END, values=row)
+		self.AccountsInfoTreeview.insert()
 		## Populate treeview with data
 		rows = FinanceProjectDatabaseAccess.AccOverDataWithTransID()
 		for row in rows:
