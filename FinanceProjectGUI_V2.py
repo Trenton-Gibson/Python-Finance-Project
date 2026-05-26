@@ -183,7 +183,7 @@ class FinanceGUI:
 		self.AccountsInfoTreeview = ttk.Treeview(self.AccountTreeviewFrame, height=10,
 												 columns=(
 												 'column1', 'column2', 'column3', 'column4', 'column5'),
-												 show='headings', yscrollcommand=self.Accounts_yscroll)
+												 show='tree headings', yscrollcommand=self.Accounts_yscroll)
 		##Define and create the columns for the Account Treeview
 		self.AccountsInfoTreeview['columns'] = (
 		'Account Type', 'Balance','Transaction Type','Transaction Amount', 'Date of Transaction')
@@ -201,9 +201,11 @@ class FinanceGUI:
 		self.AccountsInfoTreeview.grid()
 		self.Accounts_yscroll.config(command=self.AccountsInfoTreeview.yview)
 		row=("k","k","k","k","k")
+		# style=ttk.Style()
+		# style.configure(".", indicatorsize='0')
 		id2=self.AccountsInfoTreeview.insert("", tk.END, values=row)
 		self.AccountsInfoTreeview.insert(id2, tk.END, values=row)
-		self.AccountsInfoTreeview.insert()
+		# self.AccountsInfoTreeview.insert()
 		## Populate treeview with data
 		rows = FinanceProjectDatabaseAccess.AccOverDataWithTransID()
 		for row in rows:
