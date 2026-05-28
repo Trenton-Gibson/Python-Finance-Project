@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2026-05-20T02:34:35.649Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.8 Chrome/114.0.5735.289 Electron/25.5.0 Safari/537.36" etag="ASS7B2DYmAKcCOLccLBW" version="21.6.8" type="device" pages="3">
+<mxfile host="Electron" modified="2026-05-28T02:55:48.127Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.8 Chrome/114.0.5735.289 Electron/25.5.0 Safari/537.36" etag="otygK5x-YFcPMxLhajRW" version="21.6.8" type="device" pages="3">
   <diagram id="e9vRKVET7do9AkayF3Nr" name="Improved Main Page UI Rought Draft">
-    <mxGraphModel dx="2530" dy="2665" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="3457" dy="2620" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -103,7 +103,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="zeAkaGSOP7SYlK6wvkfb" name="Improve Main Page UI Final Draft">
-    <mxGraphModel dx="2045" dy="1797" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1620" dy="1818" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -227,7 +227,7 @@
           <mxGeometry x="-200" y="1510" width="540" height="200" as="geometry" />
         </mxCell>
         <mxCell id="1FAkIO_NCkhY96uos4Gl-33" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;" vertex="1" parent="1">
-          <mxGeometry x="430" y="1510" width="540" height="200" as="geometry" />
+          <mxGeometry x="400" y="1510" width="570" height="200" as="geometry" />
         </mxCell>
         <mxCell id="1FAkIO_NCkhY96uos4Gl-35" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="380" y="1499" width="10" height="220" as="geometry" />
@@ -460,11 +460,86 @@
         <mxCell id="1FAkIO_NCkhY96uos4Gl-227" value="Date of Transaction" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1FAkIO_NCkhY96uos4Gl-231">
           <mxGeometry x="431.5479876160991" width="98.45201238390094" height="20" as="geometry" />
         </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-1" value="Account Name" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="700" y="1510" width="90" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-2" value="Previous Balance" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="793" y="1510" width="90" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-3" value="Current Balance" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="883" y="1510" width="90" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-4" value="Transaction Amount" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="560" y="1510" width="80" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-5" value="Transaction Type" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="1510" width="90" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-7" value="Transaction Date" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="490" y="1510" width="70" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0;exitDx=47.5;exitDy=0;exitPerimeter=0;entryX=0.472;entryY=0.3;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=#00FF00;" edge="1" parent="1" source="CoWvmoCibH1IjMaEEmMN-12" target="1FAkIO_NCkhY96uos4Gl-32">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-12" value="Accounts will be nested inside two parent rows: one for real accounts and one for logical accounts." style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;" vertex="1" parent="1">
+          <mxGeometry x="7.5" y="1770" width="125" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0;exitDx=47.5;exitDy=0;exitPerimeter=0;entryX=0.549;entryY=0.8;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=#00FF00;" edge="1" parent="1" source="CoWvmoCibH1IjMaEEmMN-14" target="1FAkIO_NCkhY96uos4Gl-33">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-14" value="All transaction will have both accounts associated with it nested in its row." style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;" vertex="1" parent="1">
+          <mxGeometry x="665" y="1790" width="125" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-16" value="Account Type" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="640" y="1510" width="60" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-19" value="&lt;font color=&quot;#000000&quot;&gt;Gas&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFF00;" vertex="1" parent="1">
+          <mxGeometry x="400" y="1530" width="90" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-20" value="&lt;font color=&quot;#000000&quot;&gt;&amp;nbsp;1-1-1&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFF00;" vertex="1" parent="1">
+          <mxGeometry x="490" y="1530" width="70" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-21" value="&lt;font color=&quot;#000000&quot;&gt;$59&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFF00;" vertex="1" parent="1">
+          <mxGeometry x="560" y="1530" width="80" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-22" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFF00;" vertex="1" parent="1">
+          <mxGeometry x="640" y="1530" width="330" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-23" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#330066;" vertex="1" parent="1">
+          <mxGeometry x="400" y="1550" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-25" value="Gas Fund" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#330066;" vertex="1" parent="1">
+          <mxGeometry x="700" y="1550" width="90" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-26" value="Logical" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#330066;" vertex="1" parent="1">
+          <mxGeometry x="640" y="1550" width="60" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-27" value="50" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#330066;" vertex="1" parent="1">
+          <mxGeometry x="790" y="1550" width="90" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-29" value="-9" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#330066;" vertex="1" parent="1">
+          <mxGeometry x="880" y="1550" width="90" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-35" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#330066;container=0;" vertex="1" parent="1">
+          <mxGeometry x="400" y="1570" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-36" value="Real" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#330066;" vertex="1" parent="1">
+          <mxGeometry x="640" y="1570" width="60" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-37" value="Excess Cash" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#330066;" vertex="1" parent="1">
+          <mxGeometry x="700" y="1570" width="90" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-38" value="200" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#330066;" vertex="1" parent="1">
+          <mxGeometry x="790" y="1570" width="90" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="CoWvmoCibH1IjMaEEmMN-39" value="141" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#330066;" vertex="1" parent="1">
+          <mxGeometry x="880" y="1570" width="90" height="20" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
   <diagram name="Budgeting UI Rought Draft" id="X-FMak-2P0UCofctdyTl">
-    <mxGraphModel dx="1320" dy="1230" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1434" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -528,10 +603,10 @@
         <mxCell id="CRBzrXIETwY3v33HeJaV-21" value="Total Budget Allocation:&amp;nbsp; &amp;nbsp; &amp;nbsp; Unallocated Funds:&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;Percentage of Funds Unallocated:&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; Funds Allocated to the Remainder:" style="rounded=0;whiteSpace=wrap;html=1;align=left;" parent="1" vertex="1">
           <mxGeometry x="45" y="910" width="750" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="J0vMF4yp3qUS3a0RIZcF-1" value="Budget Note Field" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="J0vMF4yp3qUS3a0RIZcF-1" value="Budget Note Field" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="470" y="60" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="J0vMF4yp3qUS3a0RIZcF-2" value="Budget Item Note Field" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="J0vMF4yp3qUS3a0RIZcF-2" value="Budget Item Note Field" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="570" y="380" width="120" height="60" as="geometry" />
         </mxCell>
       </root>

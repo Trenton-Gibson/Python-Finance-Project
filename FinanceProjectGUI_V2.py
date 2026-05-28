@@ -187,6 +187,7 @@ class FinanceGUI:
 		##Define and create the columns for the Account Treeview
 		self.AccountsInfoTreeview['columns'] = (
 		'Account Type', 'Balance','Transaction Type','Transaction Amount', 'Date of Transaction')
+		self.AccountsInfoTreeview.column("#0",width=20)   
 		self.AccountsInfoTreeview.column('Account Type', width=140)
 		self.AccountsInfoTreeview.heading("#1", text="Account Type")
 		self.AccountsInfoTreeview.column('Balance', width=140)
