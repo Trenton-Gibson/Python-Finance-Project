@@ -1,6 +1,6 @@
 # Trenton Gibson
-# Created: 04/21/23
-# FinanceProjectGUI_V2.py
+# Created: 05/30/26
+# FinanceProjectGUI_V3.py
 
 #Explanation of project:
 #This a personal finance manager that can access my SQLite Database
@@ -11,7 +11,6 @@ import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 import FinanceProjectDatabaseAccess
-import tkinter.messagebox
 # Create Finance GUI class
 class FinanceGUI:
 	def __init__(self):
@@ -20,20 +19,17 @@ class FinanceGUI:
 		self.PersonalFinanceManager.title('Personal Finance Manager')
 		self.PersonalFinanceManager.state('zoomed')
 		
-		
 		# Create Frames for Personal Finance Manager window
 		# Create Parent Frames
 		self.SidebarFrame=Frame(self.PersonalFinanceManager,relief=RAISED,borderwidth=10)
 		self.TopFrame=Frame(self.PersonalFinanceManager,relief=RAISED,borderwidth=10)
 		self.TopMidFrame = Frame(self.PersonalFinanceManager,relief=RAISED,borderwidth=10)
 		self.TrueMiddleFrame= Frame(self.PersonalFinanceManager,relief=RAISED,borderwidth=10)
-		self.BottomMidFrame=Frame(self.PersonalFinanceManager,relief=RAISED,borderwidth=10)
-		self.BottomFrame=Frame(self.PersonalFinanceManager,relief=RAISED,borderwidth=10)
 		self.BudgetingFrame=Frame(self.PersonalFinanceManager,relief=RAISED,borderwidth=10)
 		# Create Child frames
 		##Child frames of top frame
 		self.TransferMoneyFrame=Frame(self.TopFrame,relief=SUNKEN,borderwidth=10)
-		self.AddDeleteAccountFrame=Frame(self.TopFrame,relief=SUNKEN,borderwidth=10)
+		self.AddAccountFrame=Frame(self.TopFrame,relief=SUNKEN,borderwidth=10)
 		self.TransferMoneyLabelsFrame=Frame(self.TopFrame,relief=SUNKEN,borderwidth=10)
 		##Child frames of top middle frame
 		self.TransactionHistoryFrame = Frame(self.TopMidFrame, relief=SUNKEN, borderwidth=10)
@@ -44,17 +40,10 @@ class FinanceGUI:
 		##Child Frames of true middle frame
 		self.AccountTreeviewFrame = Frame(self.TrueMiddleFrame, relief=SUNKEN, borderwidth=10)
 		self.TransactionTreeviewFrame = Frame(self.TrueMiddleFrame, relief=SUNKEN, borderwidth=10)
-		##Child Frame of Bottom middle frame
-		self.DeleteAccountLabelFrame=Frame(self.BottomMidFrame,relief=SUNKEN,borderwidth=10)
-		##Child Frame of Bottom frame
-		self.ButtonsFrame = Frame(self.BottomFrame, relief=RAISED, borderwidth=10)
+		
 		#pack parent frames
 		self.SidebarFrame.grid(row=0,column=0,rowspan=4,sticky="nsew")
-		self.TopFrame.grid(row=1,column=1)
-		self.TopMidFrame.grid(row=2,column=1)
-		self.TrueMiddleFrame.grid(row=3,column=1)
-		# self.BottomMidFrame.pack()
-		# self.BottomFrame.pack()
+		
 		#pack child frames
 		##Frames of Top Frame
 		self.AddDeleteAccountFrame.grid(row=0,column=0)
@@ -66,12 +55,7 @@ class FinanceGUI:
 		self.RenameAccountFrame.grid(row=1, column=1)
 		##Frames of True Middle Frame
 		self.AccountTreeviewFrame.grid(row=0, column=0)
-		self.TransactionTreeviewFrame.grid(row=0, column=1)
-		# ##Frame of Bottom Middle frame
-		# self.DeleteAccountLabelFrame.pack()
-		# ##Frame of Bottom Frame
-		# self.ButtonsFrame.pack(side='bottom')
-		
+		self.TransactionTreeviewFrame.grid(row=0, column=1)		
 		
 		# Create Widgets for Personal Finance Manager Window
 		#Create Widgets for Budgeting Frame
@@ -84,8 +68,6 @@ class FinanceGUI:
 		self.BudgetingBudgetingButton.grid(row=1, column=0,sticky='w'+'e'+'n'+'s')
 
 		#Create widgets for Sidebar Frame
-		# self.hiLabel = tk.Label(self.SidebarFrame,text='Fill the two entries',
-										#    font=('Times New Roman', 11))
 		self.AccountManagementButton=tk.Button(self.SidebarFrame, text='Account\nManagement'
 											 , font=('Times New Roman', 11), command=self.ShowAccountManagementWidgets)
 		self.BudgetingButton=tk.Button(self.SidebarFrame, text='Budgeting'
@@ -269,38 +251,6 @@ class FinanceGUI:
 		style.configure("Treeview.Heading", fieldbackground='#9613bb', font=('Times New Roman', 11))
 		style.configure("Treeview", font=('Times New Roman', 11))
 		style.configure("Treeview", foreground='yellow', background='#9613bb')
-		
-		#Create widget for Bottom Middle Frame
-		## create delete account label frame widget
-		self.DeleteAccountLabel = Label(self.DeleteAccountLabelFrame,
-										text='To Delete Account, Click the account row from the left table you want to delete then click Delete Account Button.'
-										, font=('Times New Roman', 11))
-		## Pack Delete Account label Frame
-		self.DeleteAccountLabel.grid()
-		
-		#Create Widgets for Bottom Frame
-		## Create buttons for button frame
-		self.AccOverQuitButton = tk.Button(self.ButtonsFrame, text='Quit', command=self.PersonalFinanceManager.destroy,font=('Times New Roman',11))
-		self.ConfirmTransactionButton = tk.Button(self.ButtonsFrame, text='Confirm Transaction',
-												  command=self.TransDataAndTransCommit,font=('Times New Roman',11))
-		self.AccountHistoryButton = tk.Button(self.ButtonsFrame, text="Transaction History",
-											  command=self.AccountHistory,font=('Times New Roman',11))
-		self.AddAccountButton = tk.Button(self.ButtonsFrame, text='Add Account', command=self.AddAccount,font=('Times New Roman',11))
-		self.DeleteAccountButton = tk.Button(self.ButtonsFrame, text='Delete Account', command=self.DeleteAccount,font=('Times New Roman',11))
-		self.ConfirmTransferButton = tk.Button(self.ButtonsFrame, text='Confirm Transfer',
-											   command=self.TransferringMoney,font=('Times New Roman',11))
-		self.TransHisTreeResetButton = tk.Button(self.ButtonsFrame, text='Reset Transaction Table',
-											   command=self.ResetTransHisTree, font=('Times New Roman', 11))
-		self.RenameAccountButton=tk.Button(self.ButtonsFrame, text='Rename Account',command=self.RenameAccount, font=('Times New Roman',11))
-		#Pack Widgets for the button frame
-		self.ConfirmTransferButton.grid( padx=30)
-		self.AddAccountButton.grid( padx=30)
-		self.DeleteAccountButton.grid( padx=30)
-		self.ConfirmTransactionButton.grid(padx=30)
-		self.AccountHistoryButton.grid( padx=30)
-		self.TransHisTreeResetButton.grid( padx=30)
-		self.AccOverQuitButton.grid(padx=30)
-		self.RenameAccountButton.grid(padx=30)
 		
 		# Start the mainloop
 		tk.mainloop()
