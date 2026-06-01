@@ -14,179 +14,212 @@ import FinanceProjectDatabaseAccess
 # Create Finance GUI class
 class FinanceGUI:
 	def __init__(self):
-		# Create Personal Finance Manager window and maximize the window
+		# Create Personal Finance Manager window, maximize the window, and create universal styles
 		self.PersonalFinanceManager = tk.Tk()
 		self.PersonalFinanceManager.title('Personal Finance Manager')
 		self.PersonalFinanceManager.state('zoomed')
+		self.ProjectStyle=ttk.Style()
+		self.ProjectStyle.configure('TLabel', font=('Helvetica', 11))
+		self.ProjectStyle.configure('TFrame', borderwidth='10', relief='solid')
 		
 		# Create Frames for Personal Finance Manager window
 		# Create Parent Frames
-		self.SidebarFrame=Frame(self.PersonalFinanceManager,relief=RAISED,borderwidth=10)
-		self.TopFrame=Frame(self.PersonalFinanceManager,relief=RAISED,borderwidth=10)
-		self.TopMidFrame = Frame(self.PersonalFinanceManager,relief=RAISED,borderwidth=10)
-		self.TrueMiddleFrame= Frame(self.PersonalFinanceManager,relief=RAISED,borderwidth=10)
-		self.BudgetingFrame=Frame(self.PersonalFinanceManager,relief=RAISED,borderwidth=10)
+		self.SidebarFrame=ttk.Frame(self.PersonalFinanceManager)
+		self.TopFrame=ttk.Frame(self.PersonalFinanceManager)
+		self.TopMidFrame =ttk.Frame(self.PersonalFinanceManager)
+		self.TrueMiddleFrame=ttk.Frame(self.PersonalFinanceManager)
+		self.BudgetingFrame=ttk.Frame(self.PersonalFinanceManager)
 		# Create Child frames
 		##Child frames of top frame
-		self.TransferMoneyFrame=Frame(self.TopFrame,relief=SUNKEN,borderwidth=10)
-		self.AddAccountFrame=Frame(self.TopFrame,relief=SUNKEN,borderwidth=10)
-		self.TransferMoneyLabelsFrame=Frame(self.TopFrame,relief=SUNKEN,borderwidth=10)
+		self.AddAccountFrame=ttk.Frame(self.TopFrame)
+		self. DeleteAccountFrame=ttk.Frame(self.TopFrame)
+		self.RenameAccountFrame =ttk.Frame(self.TopFrame)
 		##Child frames of top middle frame
-		self.TransactionHistoryFrame = Frame(self.TopMidFrame, relief=SUNKEN, borderwidth=10)
-		self.HandleAccountFrame = Frame(self.TopMidFrame, relief=SUNKEN, borderwidth=10)
-		self.RenameAccountFrame = Frame(self.TransactionHistoryFrame, relief=SUNKEN, borderwidth= 10)
-		### Child Frame of Handle account frame
-		self.EnterDateFrame=Frame(self.HandleAccountFrame)
+		self.HandleAccountFrame =ttk.Frame(self.TopMidFrame)
+		self.TransferMoneyFrame=ttk.Frame(self.TopMidFrame)
+		self.TransactionHistoryFrame =ttk.Frame(self.TopMidFrame)
 		##Child Frames of true middle frame
-		self.AccountTreeviewFrame = Frame(self.TrueMiddleFrame, relief=SUNKEN, borderwidth=10)
-		self.TransactionTreeviewFrame = Frame(self.TrueMiddleFrame, relief=SUNKEN, borderwidth=10)
+		self.AccountTreeviewFrame =ttk.Frame(self.TrueMiddleFrame)
+		self.TransactionTreeviewFrame =ttk.Frame(self.TrueMiddleFrame)
 		
 		#pack parent frames
 		self.SidebarFrame.grid(row=0,column=0,rowspan=4,sticky="nsew")
 		
 		#pack child frames
 		##Frames of Top Frame
-		self.AddDeleteAccountFrame.grid(row=0,column=0)
-		self.TransferMoneyLabelsFrame.grid(row=0, column=1)
-		self.TransferMoneyFrame.grid(row=0, column=2)
+		self.AddAccountFrame.grid(row=0,column=0)
+		self.DeleteAccountFrame.grid(row=0,column=1)
+		self.RenameAccountFrame.grid(row=0, column=2)
 		##Frames of Top Middle Frame
 		self.HandleAccountFrame.grid(row=0, column=0)
-		self.TransactionHistoryFrame.grid(row=0, column=1)
-		self.RenameAccountFrame.grid(row=1, column=1)
+		self.TransferMoneyFrame.grid(row=0, column=1)
+		self.TransactionHistoryFrame.grid(row=0, column=2)
 		##Frames of True Middle Frame
 		self.AccountTreeviewFrame.grid(row=0, column=0)
-		self.TransactionTreeviewFrame.grid(row=0, column=1)		
+		self.TransactionTreeviewFrame.grid(row=0, column=1)
 		
 		# Create Widgets for Personal Finance Manager Window
 		#Create Widgets for Budgeting Frame
-		self.BudgetingAccountManagementButton=tk.Button(self.BudgetingFrame, text='Account\nManagement'
-											 , font=('Times New Roman', 11), command=self.GetGivingAccount)
-		self.BudgetingBudgetingButton=tk.Button(self.BudgetingFrame, text='Budgeting'
-											 , font=('Times New Roman', 11), command=self.ShowBudgetingWidgets)
+		self.BudgetingAccountManagementButton=tk.Button(self.BudgetingFrame, text='Account\nManagement', command=self.GetGivingAccount)
+		self.BudgetingBudgetingButton=tk.Button(self.BudgetingFrame, text='Budgeting', command=self.ShowBudgetingWidgets)
 		## Add Budgeting Frame Widgets
 		self.BudgetingAccountManagementButton.grid(row=0, column=0,sticky='w'+'e'+'n'+'s')
 		self.BudgetingBudgetingButton.grid(row=1, column=0,sticky='w'+'e'+'n'+'s')
 
 		#Create widgets for Sidebar Frame
-		self.AccountManagementButton=tk.Button(self.SidebarFrame, text='Account\nManagement'
-											 , font=('Times New Roman', 11), command=self.ShowAccountManagementWidgets)
-		self.BudgetingButton=tk.Button(self.SidebarFrame, text='Budgeting'
-											 , font=('Times New Roman', 11), command=self.ShowBudgetingWidgets)
-		## Pack Sidebar Frame widgets
+		self.AccountManagementButton=tk.Button(self.SidebarFrame, text='Account\nManagement', command=self.ShowAccountManagementWidgets)
+		self.BudgetingButton=tk.Button(self.SidebarFrame, text='Budgeting', command=self.ShowBudgetingWidgets)
+		## Add Sidebar Frame widgets
 		self.AccountManagementButton.grid(row=0, column=0)
 		self.BudgetingButton.grid(row=1, column=0)
 		#Create widgets for the Top Frame
-		##create/delete account frame widgets
-		self.CreateAccountLabel = tk.Label(self.AddDeleteAccountFrame,text='Fill the two entries below for a new account then click "Add Account"',
-										   font=('Times New Roman', 11))
-		self.NameAccountLabel = tk.Label(self.AddDeleteAccountFrame, text='Name your account:',font=('Times New Roman', 11))
-		self.NameAccountEntry = tk.Entry(self.AddDeleteAccountFrame, width=50, font=('Times New Roman', 11))
-		self.IntialBalanceLabel = tk.Label(self.AddDeleteAccountFrame,text='State the intial balance(only use numbers and decimals):',
-										   font=('Times New Roman', 11))
-		self.IntialBalanceEntry = tk.Entry(self.AddDeleteAccountFrame, width=50, font=('Times New Roman', 11))
-		self.AccountNoteLabel = tk.Label(self.AddDeleteAccountFrame,text='Description of account:',
-										   font=('Times New Roman', 11))
-		self.AccontNoteEntry = tk.Entry(self.AddDeleteAccountFrame, width=50, font=('Times New Roman', 11))
-		self.ChooseAccountCategoryLabel = tk.Label(self.AddDeleteAccountFrame,text='Choose account category:',
-										   font=('Times New Roman', 11))
-		self.ChooseAccountCategoryDropbox = ttk.Combobox(self.AddDeleteAccountFrame, width=50)
-		## Pack the delete/add account frame widgets
-		self.CreateAccountLabel.grid(padx=10)
-		self.NameAccountLabel.grid(padx=10)
-		self.NameAccountEntry.grid(padx=10)
-		self.IntialBalanceLabel.grid(padx=10)
-		self.IntialBalanceEntry.grid(padx=10)
-		self.AccountNoteLabel.grid(padx=10)
-		self.AccontNoteEntry.grid(padx=10)
-		self.ChooseAccountCategoryLabel.grid(padx=10)
-		self.ChooseAccountCategoryDropbox.grid(padx=10)
-		##Create Transfer money frame widgets
-		self.GivingAccountButton = tk.Button(self.TransferMoneyFrame, text='Set Giving Account'
-											 , font=('Times New Roman', 11), command=self.GetGivingAccount)
-		self.RecipientAccountButton = tk.Button(self.TransferMoneyFrame, text='Set Recipient Account'
-												, font=('Times New Roman', 11), command=self.GetRecipientAccount)
-		self.AmountTransferredLabel = tk.Label(self.TransferMoneyFrame,
-											   text='Transfer Money Between Accounts:\n1.Set the giving(account that will be giving up money) and recipient account(account that will receive money)\n by first clicking the account in the left table and then clicking the corresponding button for each.'
-													'\n2. Put the amount the recipient account will receive(only use numbers and decimals). Finally, click "Confirm Transfer."',
-											   font=('Times New Roman', 11))
-		self.AmountTransferredEntry = tk.Entry(self.TransferMoneyFrame, width=50, font=('Times New Roman', 11))
-		## Pack Transfer money frame widgets
-		self.AmountTransferredLabel.grid()
-		self.AmountTransferredEntry.grid()
-		self.GivingAccountButton.grid()
-		self.RecipientAccountButton.grid()
-		## Create Transfer money label frame Widgets
-		self.GiverAccountLabel = tk.Label(self.TransferMoneyLabelsFrame, text='Giving Account:',
-										  font=('Times New Roman', 11), foreground='black', background='white')
-		self.RecipientAccountLabel = tk.Label(self.TransferMoneyLabelsFrame, text='Recipient Account:',
-											  font=('Times New Roman', 11), foreground='black', background='white')
-		##Pack Transer money label frame widgets
-		self.GiverAccountLabel.grid()
-		self.RecipientAccountLabel.grid()
+		##create account frame widgets
+		self.CreateAccountLabel = tk.Label(self.AddAccountFrame,text='Account Creation')
+		self.NameAccountLabel = tk.Label(self.AddAccountFrame, text='Account Name')
+		self.NameAccountEntry = tk.Entry(self.AddAccountFrame)
+		self.IntialBalanceLabel = tk.Label(self.AddAccountFrame,text='Intial Balance')
+		self.IntialBalanceEntry = tk.Entry(self.AddAccountFrame)
+		self.AccountNoteLabel = tk.Label(self.AddAccountFrame,text='Account Description')
+		self.AccontNoteEntry = tk.Entry(self.AddAccountFrame)
+		self.ChooseAccountCategoryLabel = tk.Label(self.AddAccountFrame,text='Account Category')
+		self.ChooseAccountCategoryDropbox = ttk.Combobox(self.AddAccountFrame)
+		self.CreateAccountButton=tk.Button(self.AddAccountFrame, text='Create Account', command=self.GetGivingAccount)
+		## add the create account frame widgets
+		self.CreateAccountLabel.grid(row=0,column=0, columnspan=2,padx=10)
+		self.NameAccountLabel.grid(row=1, column=0,padx=10)
+		self.NameAccountEntry.grid(row=1, column=1,padx=10)
+		self.IntialBalanceLabel.grid(row=2, column=0,padx=10)
+		self.IntialBalanceEntry.grid(row=2, column=1, padx=10)
+		self.AccountNoteLabel.grid(row=3, column=0, padx=10)
+		self.AccontNoteEntry.grid(row=3, column=1, padx=10)
+		self.ChooseAccountCategoryLabel.grid(row=4, column=0, padx=10)
+		self.ChooseAccountCategoryDropbox.grid(row=4, column=1, padx=10)
+		self.CreateAccountButton.grid(row=5, column=0, columnspan=2, ipadx=10)
+		## Create Delete Account Frame Widgets
+		self.DeleteAccountLabel=tk.Label(self.DeleteAccountFrame, text='Account Deletion')
+		self.AccountToDeleteLabel=tk.Label(self.DeleteAccountFrame, text='Account to Delete')
+		self.AccountToDeleteDropdown=ttk.Combobox(self.DeleteAccountFrame)                                                       
+		self.DeleteAccountButton=tk.Button(self.DeleteAccountFrame, text='Delete Account')
+		## Add Delete Account Frame Widgets
+		self.DeleteAccountLabel.grid(row=0, column=0,columnspan=2)
+		self.AccountToDeleteLabel.grid(row=1, column=0)
+		self.AccountToDeleteDropdown.grid(row=1,column=1)
+		self.DeleteAccountButton.grid(row=2,column=0, columnspan=2)
+		## Create Widgets for Account Renaming Frame
+		self.AccountRenamingLabel=tk.Label(self.RenameAccountFrame,text='Account Renaming')
+		self.AccountToRenameLabel=tk.Label(self.RenameAccountFrame,text='Account to Rename')
+		self.AccountToRenameDropdown=ttk.Combobox(self.RenameAccountFrame)
+		self.NewAccountNameLabel=tk.Label(self.RenameAccountFrame,text='New Account Name')
+		self.NewAccountNameField=tk.Entry(self.RenameAccountFrame)
+		self.RevisedAccountDescriptionLabel=tk.Label(self.RenameAccountFrame,text='Revised Account Description (Optional)')
+		self.RevisedAccountDescriptionField=tk.Entry(self.RenameAccountFrame)
+		self.RenameAccountButton=tk.Button(self.RenameAccountFrame, text='Rename Account')
+		## Add Widgets for Account Renaming Frame
+		self.AccountRenamingLabel.grid(row=0, column=0, columnspan=2)
+		self.AccountToRenameLabel.grid(row=1, column=0)
+		self.AccountToRenameDropdown.grid(row=1, column=1)
+		self.NewAccountNameLabel.grid(row=2, column=0)
+		self.NewAccountNameField.grid(row=2, column=1)
+		self.RevisedAccountDescriptionLabel.grid(row=3,column=0)
+		self.RevisedAccountDescriptionField.grid(row=3,column=1)
+		self.RenameAccountButton.grid(row=4, column=0, columnspan=2)
 		
 		#Create Top Middle Frame Widgets
-		## Create transaction history frame widgets
-		self.AccountHistoryLabel = tk.Label(self.TransactionHistoryFrame,
-											text="Account's Transaction history: enter the name of the account below and click the Transaction History button."
-											 "\n To restore the table, type all and click the Transaction History button.", relief= SUNKEN, borderwidth=10,
-											font=('Times New Roman', 11))
-		self.RenameAccountLabel=tk.Label(self.TransactionHistoryFrame,
-										 text='Click the account you want to rename, type in the new name, '
-											  '\nand click the "Rename Account" button.',
-											font=('Times New Roman', 11))
-		self.RenameAccountEntry=tk.Entry(self.TransactionHistoryFrame, width=50, font=('Times New Roman', 11))
-		##Pack Transaction history frame widgets
-		self.AccountHistoryLabel.grid()
-		self.RenameAccountLabel.grid()
-		self.RenameAccountEntry.grid()
 		## Create handle account frame widgets
-		self.TransactionLabel = tk.Label(self.HandleAccountFrame,
-										 text='To enter a transaction, click the account row in the left table where the transacation took place then put the transaction amount here.'
-											  '\nOnly enter numbers and decimals here(negative amount for costs and postive for income):',
-										 font=('Times New Roman', 11))
-		self.TransactionEntry = tk.Entry(self.HandleAccountFrame, width=50, font=('Times New Roman', 11))
-		self.DateofTransLabel = tk.Label(self.HandleAccountFrame, text='Next, enter the date of the transaction. All answers only use numbers.',
-										 font=('Times New Roman', 11))
-		self.MonthofTransEntry = tk.Entry(self.EnterDateFrame, width=10, font=('Times New Roman', 11))
-		self.DateDashLabel1= tk.Label(self.EnterDateFrame,text='-')
-		self.DayofTransEntry = tk.Entry(self.EnterDateFrame, width=10, font=('Times New Roman', 11))
-		self.DateDashLabel2 = tk.Label(self.EnterDateFrame, text='-')
-		self.YearofTransEntry = tk.Entry(self.EnterDateFrame, width=10, font=('Times New Roman', 11))
-		self.TransactionTypeLabel = tk.Label(self.HandleAccountFrame,
-											 text=' Third, put in what type of transaction occured and then click Confirm Transaction button:',
-											 font=('Times New Roman', 11))
-		self.TransactionTypeEntry = tk.Entry(self.HandleAccountFrame, width=50, font=('Times New Roman', 11))
-		self.ChooseAccountDropdown = ttk.Combobox(self.HandleAccountFrame, width=50)
+		self.TransactionLabel = tk.Label(self.HandleAccountFrame, text='Transaction Entry')
+		self.RealAccountLabel = tk.Label(self.HandleAccountFrame,text='Real Account')
+		self.RealAccountDropdown=ttk.Combobox(self.HandleAccountFrame)
+		self.LogicalAccountLabel=tk.Label(self.HandleAccountFrame, text='Logical Account')
+		self.LogicalAccountDropdown=ttk.Combobox(self.HandleAccountFrame)
+		self.IncomeOrExpenseLabel=tk.Label(self.HandleAccountFrame, text='Income or Expense')
+		self.IncomeOrExpenseDropdown=ttk.Combobox(self.HandleAccountFrame)
+		self.BudgetLabel=tk.Label(self.HandleAccountFrame, text='Budget (If Income)')
+		self.BudgetDropdown=ttk.Combobox(self.HandleAccountFrame)
+		self.TransactionAmountLabel=tk.Label(self.HandleAccountFrame, text='Transaction Amount')
+		self.TransactionAmountField=tk.Entry(self.HandleAccountFrame)
+		self.DateofTransLabel = tk.Label(self.HandleAccountFrame, text='Transaction Date')
+		self.MonthofTransEntry = tk.Entry(self.HandleAccountFrame)
+		self.DateDashLabel1= tk.Label(self.HandleAccountFrame,text='-')
+		self.DayofTransEntry = tk.Entry(self.HandleAccountFrame,)
+		self.DateDashLabel2 = tk.Label(self.HandleAccountFrame, text='-')
+		self.YearofTransEntry = tk.Entry(self.HandleAccountFrame,)
+		self.TransactionTypeLabel = tk.Label(self.HandleAccountFrame, text='Transaction Description')
+		self.TransactionTypeEntry = tk.Entry(self.HandleAccountFrame,)
+		self.EnterTransactionButton = tk.Button(self.HandleAccountFrame, text='Enter Transaction')
 		## Pack Handle Account Frame Widgets
-		self.TransactionLabel.grid()
-		self.TransactionEntry.grid()
-		self.DateofTransLabel.grid()
-		self.MonthofTransEntry.grid()
-		self.DateDashLabel1.grid()
-		self.DayofTransEntry.grid()
-		self.DateDashLabel2.grid()
-		self.YearofTransEntry.grid()
-		self.EnterDateFrame.grid()
-		self.TransactionTypeLabel.grid()
-		self.TransactionTypeEntry.grid()
-		self.ChooseAccountDropdown.grid()
+		self.TransactionLabel.grid(row=0, column=0, columnspan=6)
+		self.RealAccountLabel.grid(row=1, column=0)
+		self.RealAccountDropdown.grid(row=1, column=1, columnspan=5)
+		self.LogicalAccountLabel.grid(row=2, column=0)
+		self.LogicalAccountDropdown.grid(row=2, column=1, columnspan=5)
+		self.IncomeOrExpenseLabel.grid(row=3, column=0)
+		self.IncomeOrExpenseDropdown.grid(row=3, column=1, columnspan=5)
+		self.BudgetLabel.grid(row=4, column=0)
+		self.BudgetDropdown.grid(row=4, column=1, columnspan=5)
+		self.TransactionAmountLabel.grid(row=5, column=0)
+		self.TransactionAmountField.grid(row=5, column=1, columnspan=5)
+		self.DateofTransLabel.grid(row=6, column=0)
+		self.MonthofTransEntry.grid(row=6, column=1)
+		self.DateDashLabel1.grid(row=6, column=2)
+		self.DayofTransEntry.grid(row=6, column=3)
+		self.DateDashLabel2.grid(row=6, column=4)
+		self.YearofTransEntry.grid(row=6, column=5)
+		self.TransactionTypeLabel.grid(row=7, column=0)
+		self.TransactionTypeEntry.grid(row=7, column=1, columnspan=5)
+		self.EnterTransactionButton.grid(row=8, column=0, columnspan=6)
+		##Create Transfer money frame widgets
+		self.MoneyTransferLabel = tk.Label(self.TransferMoneyFrame, text='Money Transfer')
+		self.ExpendingAccountLabel=tk.Label(self.TransferMoneyFrame, text='Expending Account')
+		self.ExpendingAccountDropdown=ttk.Combobox(self.TransferMoneyFrame,)
+		self.RecipientAccountLabel=tk.Label(self.TransferMoneyFrame, text='Recipient Account')
+		self.RecipientAccountDropdown=ttk.Combobox(self.TransferMoneyFrame)
+		self.TransferAmountLabel=tk.Label(self.TransferMoneyFrame,text='Transfer Amount')
+		self.TransferAmountField=tk.Entry(self.TransferMoneyFrame)
+		self.TransferDescriptionLabel=tk.Label(self.TransferMoneyFrame, text='Transfer Description')
+		self.TransferDescriptionField=tk.Entry(self.TransferMoneyFrame)
+		self.RecordTransferButton = tk.Button(self.TransferMoneyFrame, text='Record Transfer', command=self.GetGivingAccount)
+		## Pack Transfer money frame widgets
+		self.MoneyTransferLabel.grid(row=0, column=0, columnspan=2)
+		self.ExpendingAccountLabel.grid(row=1, column=0)
+		self.ExpendingAccountDropdown.grid(row=1, column=1)
+		self.RecipientAccountLabel.grid(row=2, column=0)
+		self.RecipientAccountDropdown.grid(row=2, column=1)
+		self.TransferAmountLabel.grid(row=3, column=0)
+		self.TransferAmountField.grid(row=3, column=1)
+		self.TransferDescriptionLabel.grid(row=4, column=0)
+		self.TransferDescriptionField.grid(row=4, column=1)
+		self.RecordTransferButton.grid(row=5, column=0, columnspan=2)
+		## Create transaction history frame widgets
+		self.TransactionHistoryLabel = tk.Label(self.TransactionHistoryFrame, text='Transaction History')
+		self.AccountChoiceLabel = tk.Label(self.TransactionHistoryFrame, text='Account Choice')
+		self.AccountChoiceDropdown=ttk.Combobox(self.TransactionHistoryFrame)
+		self.ChosenAccountsLabel=tk.Label(self.TransactionHistoryFrame, text='Chosen Accounts')
+		self.ChosenAccountsField=tk.Entry(self.TransactionHistoryFrame)
+		self.ShowHistoryButton=tk.Button(self.TransactionHistoryFrame, text='Show History')
+		##Pack Transaction history frame widgets
+		self.TransactionHistoryLabel.grid(row=0, column=0, columnspan=2)
+		self.AccountChoiceLabel.grid(row=1, column=0)
+		self.AccountChoiceDropdown.grid(row=1, column=1)
+		self.ChosenAccountsLabel.grid(row=2, column=0)
+		self.ChosenAccountsField.grid(row=2, column=1)
+		self.ShowHistoryButton.grid(row=3, column=0, columnspan=2)
 		
 		#Create widgets for the True Middle Frame
 		# Create Account Treeview
 		##Create Account Treeview ScrollBar
 		self.Accounts_yscroll = Scrollbar(self.AccountTreeviewFrame)
-		self.Accounts_yscroll.grid()
+		self.Accounts_yscroll.grid(row=0, column=1)
 		##Create actual Account Treeview
 		self.AccountsInfoTreeview = ttk.Treeview(self.AccountTreeviewFrame, height=10,
 												 columns=(
-												 'column1', 'column2', 'column3', 'column4', 'column5'),
+												 'column1', 'column2', 'column3', 'column4', 'column5', 'column6'),
 												 show='tree headings', yscrollcommand=self.Accounts_yscroll)
 		##Define and create the columns for the Account Treeview
 		self.AccountsInfoTreeview['columns'] = (
-		'Account Type', 'Balance','Transaction Type','Transaction Amount', 'Date of Transaction')
+		'Account Name', 'Account Description', 'Balance','Transaction Description','Transaction Amount', 'Date of Transaction')
 		self.AccountsInfoTreeview.column("#0",width=20)   
-		self.AccountsInfoTreeview.column('Account Type', width=140)
-		self.AccountsInfoTreeview.heading("#1", text="Account Type")
+		self.AccountsInfoTreeview.column('Account Name', width=140)
+		self.AccountsInfoTreeview.heading("#1", text="Account Name")
 		self.AccountsInfoTreeview.column('Balance', width=140)
 		self.AccountsInfoTreeview.heading("#2", text="Balance")
 		self.AccountsInfoTreeview.column('Transaction Type', width=140)
@@ -248,8 +281,8 @@ class FinanceGUI:
 		
 		# Change the style of the Treeviews
 		style = ttk.Style()
-		style.configure("Treeview.Heading", fieldbackground='#9613bb', font=('Times New Roman', 11))
-		style.configure("Treeview", font=('Times New Roman', 11))
+		style.configure("Treeview.Heading", fieldbackground='#9613bb', )
+		style.configure("Treeview", )
 		style.configure("Treeview", foreground='yellow', background='#9613bb')
 		
 		# Start the mainloop
@@ -420,8 +453,8 @@ class FinanceGUI:
 				self.RepopulateAccountsTreeview()
 				self.RepopulateTransactionsTreeview()
 				#reformat labels back to original state
-				self.GiverAccountLabel.config(text='Giving Account:',font=('Times New Roman', 11), foreground='black', background='white')
-				self.RecipientAccountLabel.config(text='Recipient Account:',font=('Times New Roman', 11), foreground='black', background='white')
+				self.GiverAccountLabel.config(text='Giving Account:', foreground='black', background='white')
+				self.RecipientAccountLabel.config(text='Recipient Account:', foreground='black', background='white')
 				#clear amount transferred entry
 				self.AmountTransferredEntry.delete(0,END)
 		except:
