@@ -208,34 +208,35 @@ class FinanceGUI:
 		# Create Account Treeview
 		##Create Account Treeview ScrollBar
 		self.Accounts_yscroll = Scrollbar(self.AccountTreeviewFrame)
-		self.Accounts_yscroll.grid(row=0, column=1)
+		self.Accounts_yscroll.grid(row=0, column=0, sticky="ns")
 		##Create actual Account Treeview
 		self.AccountsInfoTreeview = ttk.Treeview(self.AccountTreeviewFrame, height=10,
 												 columns=(
 												 'column1', 'column2', 'column3', 'column4', 'column5', 'column6'),
-												 show='tree headings', yscrollcommand=self.Accounts_yscroll)
+												 show='tree headings', yscrollcommand=self.Accounts_yscroll.set)
 		##Define and create the columns for the Account Treeview
 		self.AccountsInfoTreeview['columns'] = (
 		'Account Name', 'Account Description', 'Balance','Transaction Description','Transaction Amount', 'Date of Transaction')
 		self.AccountsInfoTreeview.column("#0",width=20)   
 		self.AccountsInfoTreeview.column('Account Name', width=140)
 		self.AccountsInfoTreeview.heading("#1", text="Account Name")
+		self.AccountsInfoTreeview.column('Account Description', width=140)
+		self.AccountsInfoTreeview.heading("#2", text="Account Description")
 		self.AccountsInfoTreeview.column('Balance', width=140)
-		self.AccountsInfoTreeview.heading("#2", text="Balance")
-		self.AccountsInfoTreeview.column('Transaction Type', width=140)
-		self.AccountsInfoTreeview.heading("#3", text="Transaction Type")
+		self.AccountsInfoTreeview.heading("#3", text="Balance")
+		self.AccountsInfoTreeview.column('Transaction Description', width=140)
+		self.AccountsInfoTreeview.heading("#4", text="Transaction Description")
 		self.AccountsInfoTreeview.column('Transaction Amount', width=140)
-		self.AccountsInfoTreeview.heading("#4", text="Transaction Amount")
+		self.AccountsInfoTreeview.heading("#5", text="Transaction Amount")
 		self.AccountsInfoTreeview.column('Date of Transaction', width=140)
-		self.AccountsInfoTreeview.heading("#5", text="Date of Transaction")
+		self.AccountsInfoTreeview.heading("#6", text="Date of Transaction")
 		## Pack and configure the scrollbar for the Accounts Treeview
-		self.AccountsInfoTreeview.grid()
+		self.AccountsInfoTreeview.grid(row=0, column=1)
 		self.Accounts_yscroll.config(command=self.AccountsInfoTreeview.yview)
-		row=("k","k","k","k","k")
-		# style=ttk.Style()
-		# style.configure(".", indicatorsize='0')
-		id2=self.AccountsInfoTreeview.insert("", tk.END, values=row)
-		self.AccountsInfoTreeview.insert(id2, tk.END, values=row)
+		row=("1","k","k","k","k","k")
+		for i in range(20):
+			id2=self.AccountsInfoTreeview.insert("", tk.END, values=row)
+			self.AccountsInfoTreeview.insert(id2, tk.END, values=row)
 		# self.AccountsInfoTreeview.insert()
 		## Populate treeview with data
 		rows = FinanceProjectDatabaseAccess.AccOverDataWithTransID()
