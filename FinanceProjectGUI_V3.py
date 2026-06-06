@@ -208,7 +208,7 @@ class FinanceGUI:
 		# Create Account Treeview
 		##Create Account Treeview ScrollBar
 		self.Accounts_yscroll = Scrollbar(self.AccountTreeviewFrame)
-		self.Accounts_yscroll.grid(row=0, column=0, sticky="ns")
+		self.Accounts_yscroll.grid(row=0, column=1, sticky="ns")
 		##Create actual Account Treeview
 		self.AccountsInfoTreeview = ttk.Treeview(self.AccountTreeviewFrame, height=10,
 												 columns=(
@@ -218,20 +218,20 @@ class FinanceGUI:
 		self.AccountsInfoTreeview['columns'] = (
 		'Account Name', 'Account Description', 'Balance','Transaction Description','Transaction Amount', 'Date of Transaction')
 		self.AccountsInfoTreeview.column("#0",width=20)   
-		self.AccountsInfoTreeview.column('Account Name', width=140)
+		self.AccountsInfoTreeview.column('Account Name', width=100)
 		self.AccountsInfoTreeview.heading("#1", text="Account Name")
-		self.AccountsInfoTreeview.column('Account Description', width=140)
+		self.AccountsInfoTreeview.column('Account Description', width=100)
 		self.AccountsInfoTreeview.heading("#2", text="Account Description")
-		self.AccountsInfoTreeview.column('Balance', width=140)
+		self.AccountsInfoTreeview.column('Balance', width=100)
 		self.AccountsInfoTreeview.heading("#3", text="Balance")
-		self.AccountsInfoTreeview.column('Transaction Description', width=140)
+		self.AccountsInfoTreeview.column('Transaction Description', width=100)
 		self.AccountsInfoTreeview.heading("#4", text="Transaction Description")
-		self.AccountsInfoTreeview.column('Transaction Amount', width=140)
+		self.AccountsInfoTreeview.column('Transaction Amount', width=100)
 		self.AccountsInfoTreeview.heading("#5", text="Transaction Amount")
-		self.AccountsInfoTreeview.column('Date of Transaction', width=140)
+		self.AccountsInfoTreeview.column('Date of Transaction', width=100)
 		self.AccountsInfoTreeview.heading("#6", text="Date of Transaction")
 		## Pack and configure the scrollbar for the Accounts Treeview
-		self.AccountsInfoTreeview.grid(row=0, column=1)
+		self.AccountsInfoTreeview.grid(row=0, column=0, sticky='ns')
 		self.Accounts_yscroll.config(command=self.AccountsInfoTreeview.yview)
 		row=("1","k","k","k","k","k")
 		for i in range(20):
@@ -249,34 +249,42 @@ class FinanceGUI:
 		# Create Transaction Info treeview
 		##Create Scrollbars for Transaction Treeview
 		self.Transaction_yscroll = Scrollbar(self.TransactionTreeviewFrame)
-		self.Transaction_yscroll.grid()
+		self.Transaction_yscroll.grid(row=0, column=1, sticky='ns')
 		##Create the actual Transaction Treeview
 		self.TransHisTransactionInfo = ttk.Treeview(self.TransactionTreeviewFrame, height=10,
 													columns=(
-													'column1', 'column2', 'column3', 'column4', 'column5', 'column6',),
-													show='headings', yscrollcommand=self.Transaction_yscroll.set)
+													'column1', 'column2', 'column3', 'column4', 'column5', 'column6', 'column7'),
+													show='tree headings', yscrollcommand=self.Transaction_yscroll.set)
 		##Define and create the columns for the Transaction Treeview
-		self.TransHisTransactionInfo['columns'] = ( 'Account Type', 'Previous Balance', 'Current Balance',
+		self.TransHisTransactionInfo['columns'] = ( 'Account Type', 'Account Name','Previous Balance', 'Current Balance',
 												   'Transaction Type', 'Transaction Amount', 'Transaction Date')
-		self.TransHisTransactionInfo.column('Account Type', width=110)
-		self.TransHisTransactionInfo.heading("#1", text="Account Type")
-		self.TransHisTransactionInfo.column('Previous Balance', width=115)
-		self.TransHisTransactionInfo.heading("#2", text="Previous Balance")
-		self.TransHisTransactionInfo.column('Current Balance', width=105)
-		self.TransHisTransactionInfo.heading("#3", text="Current Balance")
-		self.TransHisTransactionInfo.column('Transaction Type', width=120)
-		self.TransHisTransactionInfo.heading("#4", text="Transaction Type")
-		self.TransHisTransactionInfo.column('Transaction Amount', width=130)
-		self.TransHisTransactionInfo.heading("#5", text="Transaction Amount")
-		self.TransHisTransactionInfo.column('Transaction Date', width=120)
-		self.TransHisTransactionInfo.heading("#6", text="Transaction Date")
+		self.TransHisTransactionInfo.column('#0', width=20)
+		self.TransHisTransactionInfo.column('Transaction Type', width=100)
+		self.TransHisTransactionInfo.heading("#1", text="Transaction Type")
+		self.TransHisTransactionInfo.column('Transaction Date', width=100)
+		self.TransHisTransactionInfo.heading("#2", text="Transaction Date")
+		self.TransHisTransactionInfo.column('Transaction Amount', width=100)
+		self.TransHisTransactionInfo.heading("#3", text="Transaction Amount")
+		self.TransHisTransactionInfo.column('Account Type', width=100)
+		self.TransHisTransactionInfo.heading("#4", text="Account Type")
+		self.TransHisTransactionInfo.column('Account Name', width=100)
+		self.TransHisTransactionInfo.heading("#5", text="Account Name")
+		self.TransHisTransactionInfo.column('Previous Balance', width=100)
+		self.TransHisTransactionInfo.heading("#6", text="Previous Balance")
+		self.TransHisTransactionInfo.column('Current Balance', width=100)
+		self.TransHisTransactionInfo.heading("#7", text="Current Balance")
 		##Pack the Transaction Treeview
-		self.TransHisTransactionInfo.grid()
+		self.TransHisTransactionInfo.grid(row=0, column=0, sticky='ns')
 		##Configure the Transaction Treeview Scrollbar
 		self.Transaction_yscroll.config(command=self.TransHisTransactionInfo.yview)
 		##Populate the Transaction Treeview with data
 		self.StartAccountHistory = ''
 		rows = FinanceProjectDatabaseAccess.AccountTransactionHistory(self.StartAccountHistory)
+		row=("1","k","k","","","","")
+		row2=("","","","k","k","k","k")
+		for i in range(20):
+			id2=self.TransHisTransactionInfo.insert("", tk.END, values=row)
+			self.TransHisTransactionInfo.insert(id2, tk.END, values=row2)
 		for row in rows:
 			self.TransHisTransactionInfo.insert("", tk.END, values=row)
 		
