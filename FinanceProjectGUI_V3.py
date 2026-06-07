@@ -41,6 +41,9 @@ class FinanceGUI:
 		##Child Frames of true middle frame
 		self.AccountTreeviewFrame =ttk.Frame(self.TrueMiddleFrame)
 		self.TransactionTreeviewFrame =ttk.Frame(self.TrueMiddleFrame)
+		##Child frames of Budgeting Frame
+		self.CreateBudgetFrame=ttk.Frame(self.BudgetingFrame)
+		self.EditBudgetFrame=ttk.Frame(self.BudgetingFrame)
 		
 		#pack parent frames
 		self.SidebarFrame.grid(row=0,column=0,rowspan=4,sticky="nsew")
@@ -57,15 +60,71 @@ class FinanceGUI:
 		##Frames of True Middle Frame
 		self.AccountTreeviewFrame.grid(row=0, column=0)
 		self.TransactionTreeviewFrame.grid(row=0, column=1)
+		##Frames of Budgeting Frame
+		self.CreateBudgetFrame.grid(row=0, column=0)
+		self.EditBudgetFrame.grid(row=1, column=0, sticky="ew")
 		
 		# Create Widgets for Personal Finance Manager Window
-		#Create Widgets for Budgeting Frame
-		self.BudgetingAccountManagementButton=tk.Button(self.BudgetingFrame, text='Account\nManagement', command=self.GetGivingAccount)
-		self.BudgetingBudgetingButton=tk.Button(self.BudgetingFrame, text='Budgeting', command=self.ShowBudgetingWidgets)
-		## Add Budgeting Frame Widgets
-		self.BudgetingAccountManagementButton.grid(row=0, column=0,sticky='w'+'e'+'n'+'s')
-		self.BudgetingBudgetingButton.grid(row=1, column=0,sticky='w'+'e'+'n'+'s')
-
+		#Create UI for Budgeting Page
+		## Create Widgets for the Create Budget Frame
+		self.CreateBudgetLabel=tk.Label(self.CreateBudgetFrame, text="Budget Creation")
+		self.BudgetNameLabel=tk.Label(self.CreateBudgetFrame, text="Budget Name")
+		self.BudgetNameField=tk.Entry(self.CreateBudgetFrame)
+		self.BudgetDescriptionLabel=tk.Label(self.CreateBudgetFrame, text="Budget Description")
+		self.BudgetDescriptionField=tk.Entry(self.CreateBudgetFrame)
+		self.CreateBudgetButton=tk.Button(self.CreateBudgetFrame, text="Create Budget")
+		## Add widgets to create budget frame
+		self.CreateBudgetLabel.grid(row=1, column=0)
+		self.BudgetNameLabel.grid(row=0, column=1)
+		self.BudgetNameField.grid(row=1, column=1)
+		self.BudgetDescriptionLabel.grid(row=0, column=2)
+		self.BudgetDescriptionField.grid(row=1, column=2)
+		self.CreateBudgetButton.grid(row=1, column=3)
+		## Create Widgets for Edit Budget Frame
+		self.BudgetEditingAndViewingLabel=tk.Label(self.EditBudgetFrame, text="Budget Editing and Viewing")
+		self.BudgetEditingDropdownLabel=tk.Label(self.EditBudgetFrame, text="Budget to Edit or View")
+		self.BudgetEditingDropdown=ttk.Combobox(self.EditBudgetFrame)
+		self.AddNewBudgetItemLabel=tk.Label(self.EditBudgetFrame, text="Add new button budget item below!")
+		self.EditBudgetLogicalDropdownLabel=tk.Label(self.EditBudgetFrame,text="Logical Account")
+		self.EditBudgetLogicalDropdown=ttk.Combobox(self.EditBudgetFrame)
+		self.BudgetAllocationTypeDropdownLabel=tk.Label(self.EditBudgetFrame, text="Budget Allocation Type")
+		self.BudgetAllocationTypeDropdown=ttk.Combobox(self.EditBudgetFrame)
+		self.BudgetItemNoteLabel=tk.Label(self.EditBudgetFrame, text="Budget Item Note")
+		self.BudgetItemNoteField=ttk.Combobox(self.EditBudgetFrame)
+		self.CreateBudgetItemButton=tk.Button(self.EditBudgetFrame, text="Create Budget Item")
+		self.Budget_yscroll = Scrollbar(self.AccountTreeviewFrame)
+		self.AccountsInfoTreeview = ttk.Treeview(self.EditBudgetFrame, height=10,
+												 columns=(
+												 'column1', 'column2', 'column3', 'column4'),
+												 show='tree headings', yscrollcommand=self.Budget_yscroll.set)
+		##Define and create the columns for the Account Treeview
+		self.AccountsInfoTreeview['columns'] = (
+		'Account Name', 'Account Description', 'Balance','Transaction Description','Transaction Amount', 'Date of Transaction')
+		self.AccountsInfoTreeview.column("#0",width=20)   
+		self.AccountsInfoTreeview.column('Logical', width=100)
+		self.AccountsInfoTreeview.heading("#1", text="Account Name")
+		self.AccountsInfoTreeview.column('Account Description', width=100)
+		self.AccountsInfoTreeview.heading("#2", text="Account Description")
+		self.AccountsInfoTreeview.column('Balance', width=100)
+		self.AccountsInfoTreeview.heading("#3", text="Balance")
+		self.AccountsInfoTreeview.column('Transaction Description', width=100)
+		self.AccountsInfoTreeview.heading("#4", text="Transaction Description")
+		## Pack and configure the scrollbar for the Accounts Treeview
+		self.AccountsInfoTreeview.grid(row=1, column=0, sticky='ns')
+		self.Accounts_yscroll.config(command=self.AccountsInfoTreeview.yview)
+		row=("1","k","k","k","k","k")
+		for i in range(20):
+			id2=self.AccountsInfoTreeview.insert("", tk.END, values=row)
+			self.AccountsInfoTreeview.insert(id2, tk.END, values=row)
+		# self.AccountsInfoTreeview.insert()
+		## Populate treeview with data
+		rows = FinanceProjectDatabaseAccess.AccOverDataWithTransID()
+		for row in rows:
+			self.AccountsInfoTreeview.insert("", tk.END, values=row)
+		rows = FinanceProjectDatabaseAccess.AccOverDataWithoutTransID()
+		for row in rows:
+			self.AccountsInfoTreeview.insert("", tk.END, values=row)
+		
 		#Create widgets for Sidebar Frame
 		self.AccountManagementButton=tk.Button(self.SidebarFrame, text='Account\nManagement', command=self.ShowAccountManagementWidgets)
 		self.BudgetingButton=tk.Button(self.SidebarFrame, text='Budgeting', command=self.ShowBudgetingWidgets)
@@ -205,10 +264,12 @@ class FinanceGUI:
 		self.ShowHistoryButton.grid(row=3, column=0, columnspan=2)
 		
 		#Create widgets for the True Middle Frame
+		self.AccountsInfoLabel=tk.Label(self.AccountTreeviewFrame, text="Account Table")
+		self.AccountsInfoLabel.grid(row=0,column=0, columnspan=2 )
 		# Create Account Treeview
 		##Create Account Treeview ScrollBar
 		self.Accounts_yscroll = Scrollbar(self.AccountTreeviewFrame)
-		self.Accounts_yscroll.grid(row=0, column=1, sticky="ns")
+		self.Accounts_yscroll.grid(row=1, column=1, sticky="ns")
 		##Create actual Account Treeview
 		self.AccountsInfoTreeview = ttk.Treeview(self.AccountTreeviewFrame, height=10,
 												 columns=(
@@ -231,7 +292,7 @@ class FinanceGUI:
 		self.AccountsInfoTreeview.column('Date of Transaction', width=100)
 		self.AccountsInfoTreeview.heading("#6", text="Date of Transaction")
 		## Pack and configure the scrollbar for the Accounts Treeview
-		self.AccountsInfoTreeview.grid(row=0, column=0, sticky='ns')
+		self.AccountsInfoTreeview.grid(row=1, column=0, sticky='ns')
 		self.Accounts_yscroll.config(command=self.AccountsInfoTreeview.yview)
 		row=("1","k","k","k","k","k")
 		for i in range(20):
@@ -247,9 +308,12 @@ class FinanceGUI:
 			self.AccountsInfoTreeview.insert("", tk.END, values=row)
 		
 		# Create Transaction Info treeview
+		#Create Transaction table widget
+		self.TransactionHistoryLabel=tk.Label(self.TransactionTreeviewFrame, text="Transaction Table")
+		self.TransactionHistoryLabel.grid(row=0,column=0, columnspan=2 )
 		##Create Scrollbars for Transaction Treeview
 		self.Transaction_yscroll = Scrollbar(self.TransactionTreeviewFrame)
-		self.Transaction_yscroll.grid(row=0, column=1, sticky='ns')
+		self.Transaction_yscroll.grid(row=1, column=1, sticky='ns')
 		##Create the actual Transaction Treeview
 		self.TransHisTransactionInfo = ttk.Treeview(self.TransactionTreeviewFrame, height=10,
 													columns=(
@@ -274,7 +338,7 @@ class FinanceGUI:
 		self.TransHisTransactionInfo.column('Current Balance', width=100)
 		self.TransHisTransactionInfo.heading("#7", text="Current Balance")
 		##Pack the Transaction Treeview
-		self.TransHisTransactionInfo.grid(row=0, column=0, sticky='ns')
+		self.TransHisTransactionInfo.grid(row=1, column=0, sticky='ns')
 		##Configure the Transaction Treeview Scrollbar
 		self.Transaction_yscroll.config(command=self.TransHisTransactionInfo.yview)
 		##Populate the Transaction Treeview with data
@@ -293,7 +357,7 @@ class FinanceGUI:
 		style.configure("Treeview.Heading", fieldbackground='#9613bb', )
 		style.configure("Treeview", )
 		style.configure("Treeview", foreground='yellow', background='#9613bb')
-		
+
 		# Start the mainloop
 		tk.mainloop()
 		
