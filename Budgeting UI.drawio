@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2026-06-07T03:13:19.521Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.8 Chrome/114.0.5735.289 Electron/25.5.0 Safari/537.36" etag="J08_t819JdQDhNSGIdyM" version="21.6.8" type="device" pages="3">
+<mxfile host="Electron" modified="2026-06-11T03:13:07.934Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.8 Chrome/114.0.5735.289 Electron/25.5.0 Safari/537.36" etag="JA4qODHRT7VA-Eh9gm0x" version="21.6.8" type="device" pages="3">
   <diagram id="e9vRKVET7do9AkayF3Nr" name="Improved Main Page UI Rought Draft">
     <mxGraphModel dx="1583" dy="1747" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -103,7 +103,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="zeAkaGSOP7SYlK6wvkfb" name="Improve Main Page UI Final Draft">
-    <mxGraphModel dx="2736" dy="1970" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1322" dy="1927" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -262,10 +262,10 @@
         <mxCell id="1FAkIO_NCkhY96uos4Gl-50" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" parent="1" vertex="1">
           <mxGeometry x="-70" y="1187" width="110" height="10" as="geometry" />
         </mxCell>
-        <mxCell id="1FAkIO_NCkhY96uos4Gl-51" value="Account Description" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+        <mxCell id="1FAkIO_NCkhY96uos4Gl-51" value="Account Description&lt;br&gt;(Optional)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="-190" y="1177" width="110" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="1FAkIO_NCkhY96uos4Gl-53" value="Account Category" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+        <mxCell id="1FAkIO_NCkhY96uos4Gl-53" value="Account Category" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="-190" y="1197" width="110" height="30" as="geometry" />
         </mxCell>
         <mxCell id="1FAkIO_NCkhY96uos4Gl-55" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;" parent="1" vertex="1">
@@ -548,7 +548,7 @@
     </mxGraphModel>
   </diagram>
   <diagram name="Budgeting UI Rought Draft" id="X-FMak-2P0UCofctdyTl">
-    <mxGraphModel dx="2219" dy="1024" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1087" dy="1013" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />

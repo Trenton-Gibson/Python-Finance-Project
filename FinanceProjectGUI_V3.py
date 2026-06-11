@@ -10,6 +10,7 @@
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 import FinanceProjectDatabaseAccess
 # Create Finance GUI class
 class FinanceGUI:
@@ -155,7 +156,7 @@ class FinanceGUI:
 		self.IntialBalanceLabel = tk.Label(self.AddAccountFrame,text='Intial Balance')
 		self.IntialBalanceEntry = tk.Entry(self.AddAccountFrame)
 		self.AccountNoteLabel = tk.Label(self.AddAccountFrame,text='Account Description')
-		self.AccontNoteEntry = tk.Entry(self.AddAccountFrame)
+		self.AccountNoteEntry = tk.Entry(self.AddAccountFrame)
 		self.ChooseAccountCategoryLabel = tk.Label(self.AddAccountFrame,text='Account Category')
 		self.ChooseAccountCategoryDropbox = ttk.Combobox(self.AddAccountFrame)
 		self.CreateAccountButton=tk.Button(self.AddAccountFrame, text='Create Account', command=self.GetGivingAccount)
@@ -166,7 +167,7 @@ class FinanceGUI:
 		self.IntialBalanceLabel.grid(row=2, column=0,padx=10)
 		self.IntialBalanceEntry.grid(row=2, column=1, padx=10)
 		self.AccountNoteLabel.grid(row=3, column=0, padx=10)
-		self.AccontNoteEntry.grid(row=3, column=1, padx=10)
+		self.AccountNoteEntry.grid(row=3, column=1, padx=10)
 		self.ChooseAccountCategoryLabel.grid(row=4, column=0, padx=10)
 		self.ChooseAccountCategoryDropbox.grid(row=4, column=1, padx=10)
 		self.CreateAccountButton.grid(row=5, column=0, columnspan=2, ipadx=10)
@@ -310,10 +311,6 @@ class FinanceGUI:
 		## Pack and configure the scrollbar for the Accounts Treeview
 		self.AccountsInfoTreeview.grid(row=1, column=0, sticky='ns')
 		self.Accounts_yscroll.config(command=self.AccountsInfoTreeview.yview)
-		row=("1","k","k","k","k","k")
-		for i in range(20):
-			id2=self.AccountsInfoTreeview.insert("", tk.END, values=row)
-			self.AccountsInfoTreeview.insert(id2, tk.END, values=row)
 		# self.AccountsInfoTreeview.insert()
 		## Populate treeview with data
 		rows = FinanceProjectDatabaseAccess.AccOverDataWithTransID()
@@ -360,11 +357,6 @@ class FinanceGUI:
 		##Populate the Transaction Treeview with data
 		self.StartAccountHistory = ''
 		rows = FinanceProjectDatabaseAccess.AccountTransactionHistory(self.StartAccountHistory)
-		row=("1","k","k","","","","")
-		row2=("","","","k","k","k","k")
-		for i in range(20):
-			id2=self.TransHisTransactionInfo.insert("", tk.END, values=row)
-			self.TransHisTransactionInfo.insert(id2, tk.END, values=row2)
 		for row in rows:
 			self.TransHisTransactionInfo.insert("", tk.END, values=row)
 		
@@ -424,12 +416,24 @@ class FinanceGUI:
 	#Creates a new account
 	def AddAccount(self):
 		try:
+			self.CreateAccountLabel = tk.Label(self.AddAccountFrame,text='Account Creation')
+			self.NameAccountLabel = tk.Label(self.AddAccountFrame, text='Account Name')
+			self.NameAccountEntry = tk.Entry(self.AddAccountFrame)
+			self.IntialBalanceLabel = tk.Label(self.AddAccountFrame,text='Intial Balance')
+			self.IntialBalanceEntry = tk.Entry(self.AddAccountFrame)
+			self.AccountNoteLabel = tk.Label(self.AddAccountFrame,text='Account Description')
+			self.AccountNoteEntry = tk.Entry(self.AddAccountFrame)
+			self.ChooseAccountCategoryLabel = tk.Label(self.AddAccountFrame,text='Account Category')
+			self.ChooseAccountCategoryDropbox = ttk.Combobox(self.AddAccountFrame)
+			self.CreateAccountButton=tk.Button(self.AddAccountFrame, text='Create Account', command=self.GetGivingAccount)
 			#get data from the entries to create a new account
 			self.AccountName = self.NameAccountEntry.get()
 			self.IntialBalance = self.IntialBalanceEntry.get()
-			self.IntialBalance= float(self.IntialBalance)
+			self.IntialBalance = float(self.IntialBalance)
+			self.AccountDescription = self.AccountNoteEntry.get()
+			self.AccountCategory = self.ChooseAccountCategoryDropdown.get()
 			# If any of the entries are unpopulated, it sends an error message and the core code isn't executed
-			if self.AccountName == '' or self.IntialBalance == '':
+			if self.AccountName == '' or self.IntialBalance == '' or self.AccountCategory == '':
 				# Create an error message variable
 				self.ErrorMessage = 'Error! Follow the directions and please try again.'
 				# Display the error message in an info dialog box.
