@@ -205,12 +205,16 @@ with lite.connect(DIR_PATH) as conn:
 		
 		
 	#add account into database
-	def AddAccount(Balance,AccountType):
+	def AddAccount(Balance,AccountName,AccountNote,AccountType):
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
-		#insert the new account data, commit the data, and close the database
-		cur.execute('''INSERT INTO Real_Account (Balance,Real_Account_Type)VALUES(?,?)''',(Balance,AccountType))
+		#insert the new account data into the appropriate table
+		if AccountType=='Real':
+			cur.execute('''INSERT INTO Real_Account (Real_Account_Balance,Real_Account_Type,Real_Account_Note)VALUES(?,?,?)''',(Balance,AccountName,AccountNote))
+		if AccountType=='Logical':
+			cur.execute('''INSERT INTO Logical_Account (Logical_Account_Balance,Logical_Account_Type,Logical_Account_Note)VALUES(?,?,?)''',(Balance,AccountName,AccountNote))
+		#commit the data, and close the database
 		conn.commit()
 		conn.close()
 

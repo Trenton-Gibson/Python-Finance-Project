@@ -148,6 +148,7 @@ class FinanceGUI:
 		## Add Sidebar Frame widgets
 		self.AccountManagementButton.grid(row=0, column=0)
 		self.BudgetingButton.grid(row=1, column=0)
+
 		#Create widgets for the Top Frame
 		##create account frame widgets
 		self.CreateAccountLabel = tk.Label(self.AddAccountFrame,text='Account Creation')
@@ -159,7 +160,7 @@ class FinanceGUI:
 		self.AccountNoteEntry = tk.Entry(self.AddAccountFrame)
 		self.ChooseAccountCategoryLabel = tk.Label(self.AddAccountFrame,text='Account Category')
 		self.ChooseAccountCategoryDropbox = ttk.Combobox(self.AddAccountFrame)
-		self.CreateAccountButton=tk.Button(self.AddAccountFrame, text='Create Account', command=self.GetGivingAccount)
+		self.CreateAccountButton=tk.Button(self.AddAccountFrame, text='Create Account', command=self.AddAccount)
 		## add the create account frame widgets
 		self.CreateAccountLabel.grid(row=0,column=0, columnspan=2,padx=10)
 		self.NameAccountLabel.grid(row=1, column=0,padx=10)
@@ -441,7 +442,7 @@ class FinanceGUI:
 			#The core code
 			else:
 				#Add Account Function is called from the other module to interact with the database
-				FinanceProjectDatabaseAccess.AddAccount(self.IntialBalance, self.AccountName)
+				FinanceProjectDatabaseAccess.AddAccount(self.IntialBalance, self.AccountName, self.AccountDescription, self.AccountCategory)
 				# Repopulate treeviews with data
 				self.RepopulateAccountsTreeview()
 				self.RepopulateTransactionsTreeview()
@@ -621,11 +622,11 @@ class FinanceGUI:
 		#obtain data for accounts with transactions recorded and add the data to the treeview
 		rows = FinanceProjectDatabaseAccess.AccOverDataWithTransID()
 		for row in rows:
-			self.AccountsInfoTreeview.insert("", tk.END, values=row)
+			self.AccountsInfoTreeview.insert("", -1, values=row)
 		# obtain data for accounts without transactions recorded and add the data to the treeview
 		rows = FinanceProjectDatabaseAccess.AccOverDataWithoutTransID()
 		for row in rows:
-			self.AccountsInfoTreeview.insert("", tk.END, values=row)
+			self.AccountsInfoTreeview.insert("", -1, values=row)
 			
 			
 	#Repopulate the transaction treeview with data
