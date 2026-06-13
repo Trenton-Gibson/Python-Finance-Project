@@ -320,6 +320,11 @@ class FinanceGUI:
 		rows = FinanceProjectDatabaseAccess.AccOverDataWithoutTransID()
 		for row in rows:
 			self.AccountsInfoTreeview.insert("", tk.END, values=row)
+		row=("1","k","k","","","","")
+		row2=("","","","k","k","k","k")
+		for i in range(20):
+			id2=self.TransHisTransactionInfo.insert("", tk.END, values=row)
+			self.TransHisTransactionInfo.insert(id2, tk.END, values=row2)
 		
 		# Create Transaction Info treeview
 		#Create Transaction table widget
@@ -360,7 +365,11 @@ class FinanceGUI:
 		rows = FinanceProjectDatabaseAccess.AccountTransactionHistory(self.StartAccountHistory)
 		for row in rows:
 			self.TransHisTransactionInfo.insert("", tk.END, values=row)
-		
+		row=("1","k","k","","","","")
+		row2=("","","","k","k","k","k")
+		for i in range(20):
+			id2=self.TransHisTransactionInfo.insert("", tk.END, values=row)
+			self.TransHisTransactionInfo.insert(id2, tk.END, values=row2)
 		# Change the style of the Treeviews
 		style = ttk.Style()
 		style.configure("Treeview.Heading", fieldbackground='#9613bb', )
@@ -417,16 +426,6 @@ class FinanceGUI:
 	#Creates a new account
 	def AddAccount(self):
 		try:
-			self.CreateAccountLabel = tk.Label(self.AddAccountFrame,text='Account Creation')
-			self.NameAccountLabel = tk.Label(self.AddAccountFrame, text='Account Name')
-			self.NameAccountEntry = tk.Entry(self.AddAccountFrame)
-			self.IntialBalanceLabel = tk.Label(self.AddAccountFrame,text='Intial Balance')
-			self.IntialBalanceEntry = tk.Entry(self.AddAccountFrame)
-			self.AccountNoteLabel = tk.Label(self.AddAccountFrame,text='Account Description')
-			self.AccountNoteEntry = tk.Entry(self.AddAccountFrame)
-			self.ChooseAccountCategoryLabel = tk.Label(self.AddAccountFrame,text='Account Category')
-			self.ChooseAccountCategoryDropbox = ttk.Combobox(self.AddAccountFrame)
-			self.CreateAccountButton=tk.Button(self.AddAccountFrame, text='Create Account', command=self.GetGivingAccount)
 			#get data from the entries to create a new account
 			self.AccountName = self.NameAccountEntry.get()
 			self.IntialBalance = self.IntialBalanceEntry.get()
@@ -619,14 +618,16 @@ class FinanceGUI:
 		#Clears the old treeview data
 		for item in self.AccountsInfoTreeview.get_children():
 			self.AccountsInfoTreeview.delete(item)
+		RealAccounts=self.AccountsInfoTreeview.insert("",-1,values=("Real Accounts","","","","",""))
+		LogicalAccounts=self.AccountsInfoTreeview.insert("",-1,values=("Logical Accounts","","","","",""))
 		#obtain data for accounts with transactions recorded and add the data to the treeview
-		rows = FinanceProjectDatabaseAccess.AccOverDataWithTransID()
-		for row in rows:
-			self.AccountsInfoTreeview.insert("", -1, values=row)
+		RealAccountsList, LogicalAccountsList = FinanceProjectDatabaseAccess.AccountOverviewData()
+		for row in RealAccountsList:
+			self.AccountsInfoTreeview.insert(RealAccounts, -1, values=row)
 		# obtain data for accounts without transactions recorded and add the data to the treeview
 		rows = FinanceProjectDatabaseAccess.AccOverDataWithoutTransID()
-		for row in rows:
-			self.AccountsInfoTreeview.insert("", -1, values=row)
+		for row in LogicalAccountsList:
+			self.AccountsInfoTreeview.insert(LogicalAccounts, -1, values=row)
 			
 			
 	#Repopulate the transaction treeview with data
@@ -640,6 +641,7 @@ class FinanceGUI:
 		for row in TransactionAccountHistory:
 			self.TransHisTransactionInfo.insert("", tk.END, values=row)
 	
+
 	def ResetTransHisTree(self):
 		#make account history an empty string to reset the treeview
 		self.AccountHistory=''
@@ -652,6 +654,7 @@ class FinanceGUI:
 		for row in self.TransactionAccountHistory:
 			self.TransHisTransactionInfo.insert("", tk.END, values=row)
 	
+
 	##Renames the account of your choosing to whatever you put in the entry
 	def RenameAccount(self):
 		try:
@@ -685,11 +688,13 @@ class FinanceGUI:
 			# Display the error message in an info dialog box.
 			tk.messagebox.showinfo('Error!', self.ErrorMessage)
 
+
 	def ShowBudgetingWidgets(self):
 		self.TopFrame.grid_remove()
 		self.TopMidFrame.grid_remove()
 		self.TrueMiddleFrame.grid_remove()
 		self.BudgetingFrame.grid(row=0,column=1)
+	
 	
 	def ShowAccountManagementWidgets(self):
 		self.BudgetingFrame.grid_remove()

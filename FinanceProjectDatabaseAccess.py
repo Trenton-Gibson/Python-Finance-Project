@@ -11,46 +11,65 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DIR_PATH= os.path.join(BASE_DIR, "PythonFinances.db")
 with lite.connect(DIR_PATH) as conn:
 
-	#Gets AccountIDs with Transactions and
+	# Gets accountIDs with Transactions and
 	# returns the info on the latest transaction for that account
-	def AccOverDataWithTransID():
+	def AccountOverviewData():
 		#connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
-		#Gets a list of all the account IDs in integer form
-		AccountIDs = AccountOverviewTreeviewDataFiltering()
 		# create a rows list and add rows tuple
-		#rows list holds data for the lastest transaction in that account
-		#AddRows tuple receives the data from the queries acquiring data on the most recent transaction for an account
+		# rows list holds data for the lastest transaction in an account,
+		# RowGroup contains the data for a specific type of account either
+		# real or logical, AddRows tuple receives the data from the SQL queries acquiring 
+		# data on the most recent transaction for an account.
 		rows=[]
+		RowGroup=[]
 		AddRows=()
-		#loop acquires all data for accounts with transactionIDs
-		for item in AccountIDs:
-			#gets a list of all the transactionIDs in integer form
-			TransIDList= TransIDProcessing(item)
-			#if an account doesn't have transactions recorded for it TransIDList will equal 'e'
-			# and thus won't get access to the core code
-			if 'e' not in TransIDList:
-				#we get the highest transactionID because it will be the most recent.
-				#turn into a string so it can be processed
-				#get all the info for the account and its most recent transaction
-				#and put it in the rows list to populate the account treeview
-				MaxTransID = max(TransIDList)
-				MaxTransID=str(MaxTransID)
-				AddRows= tuple(WithTransIDAccountInfo(MaxTransID))
-				rows.insert(1,AddRows)
+		# The following for loop get account overview data for the 
+		# account types in the list right below.
+		AccountTypes=['Real','Logical']
+		for AccountType in AccountTypes:
+			RowGroup=[]
+			#Gets a list of all the account IDs in integer form
+			AccountIDs = AccountOverviewTreeviewDataFiltering(AccountType)
+			if AccountsIDs=='':
+				return
+			#loop acquires all data for accounts with transactionIDs
+			for item in AccountIDs:
+				#gets a list of all the transactionIDs in integer form
+				TransIDList = TransIDProcessing(AccountType, item)
+				#if an account doesn't have transactions recorded for it TransIDList will equal 'e'
+				# and thus won't get access to the core code
+				if 'e' not in TransIDList:
+					#we get the highest transactionID because it will be the most recent.
+					#turn into a string so it can be processed
+					#get all the info for the account and its most recent transaction
+					#and put it in the rows list to populate the account treeview
+					MaxTransID = max(TransIDList)
+					MaxTransID=str(MaxTransID)
+					AddRows= tuple(WithTransIDAccountInfo(MaxTransID, AccountType))
+					RowGroup.insert(1,AddRows)
+			cur.execute('''SELECT ?_Account_Type,?_Account_Balance FROM ?_Account
+			WHERE ?AccountID NOT IN (SELECT ?AccountID FROM 'Transaction')''',(AccountType
+			,AccountType,AccountType,AccountType,AccountType,))
+			AddRows=cur.fetchall()
+			RowGroup+=AddRows
+			rows.insert(RowGroup)
 		#close the database and return our data
 		conn.close()
 		return rows
 	
 		
-	#transforms the all the accountsID from tuple into usable integer form
-	def AccountOverviewTreeviewDataFiltering():
+	#transforms all the accountsID from tuple into usable integer form
+	def AccountOverviewTreeviewDataFiltering(AccountType):
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
 		#get all the accountIds from the database
-		cur.execute("SELECT RealAccountID FROM Real_Account")
+		if AccountType=='Real' or Account=='Logical':
+			cur.execute('''SELECT ?AccountID FROM ?_Account''', (AccountType, AccountType))
+		else:
+			return ''
 		rows = list(cur.fetchall())
 		# make an empty list to put all the transformed account Ids in
 		AccIDList = []
@@ -68,12 +87,12 @@ with lite.connect(DIR_PATH) as conn:
 	
 	#Gets a list of transactionIDs in integer form, instead of tuple,
 	# so we can determine the most recent transaction ID for an account(the highest integer)
-	def TransIDProcessing(AccountID):
+	def TransIDProcessing(AccountType,AccountID):
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
 		#get all the transactionIDs for a specific account
-		cur.execute("SELECT TransactionID FROM 'Transaction' WHERE RealAccountID=?", (AccountID,))
+		cur.execute("SELECT TransactionID FROM 'Transaction' WHERE ?AccountID=?", (AccountType,AccountID))
 		TransID = cur.fetchall()
 		#create a list that will be filled with TransactionIDs
 		#that have been transformed from tuple into integer
@@ -100,15 +119,16 @@ with lite.connect(DIR_PATH) as conn:
 		
 		
 	#gets the account info for accounts with transaction records
-	def WithTransIDAccountInfo(MaxTransID):
+	def WithTransIDAccountInfo(AccountType, MaxTransID):
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur=conn.cursor()
 		#get all the data from the database for accounts with transactions
-		cur.execute('''SELECT Real_Account.Real_Account_Type,Real_Account.Real_Account_Balance,'Transaction'.Transaction_Type
+		cur.execute('''SELECT ?_Account.?_Account_Type,?_Account.?_Account_Balance,'Transaction'.Transaction_Type
 		,'Transaction'.Money_Transferred,'Transaction'.Date_Of_Transaction
-		FROM Real_Account INNER JOIN 'Transaction' ON Real_Account.RealAccountID= 'Transaction'.RealAccountID
-		WHERE TransactionID=?''',(MaxTransID,))
+		FROM ?_Account INNER JOIN 'Transaction' ON ?_Account.?AccountID= 'Transaction'.?AccountID
+		WHERE TransactionID=?''',(AccountType, AccountType, AccountType
+		, AccountType, AccountType, AccountType, AccountType, AccountType, MaxTransID,))
 		rows = cur.fetchall()
 		#turn the rows into a string
 		for item in rows:
@@ -117,22 +137,7 @@ with lite.connect(DIR_PATH) as conn:
 		rows=String
 		#close the database and return rows
 		conn.close()
-		return rows
-	
-	
-	#Get Accounts without Transactions
-	def AccOverDataWithoutTransID():
-		# connect to the database and make a cursor
-		conn = lite.connect(DIR_PATH)
-		cur = conn.cursor()
-		#get the data for accounts without transaction records
-		cur.execute('''SELECT Real_Account_Type,Real_Account_Balance FROM Real_Account
-		WHERE RealAccountID NOT IN (SELECT RealAccountID FROM 'Transaction') ''')
-		rows=cur.fetchall()
-		# close the database and return rows
-		conn.close()
-		return rows
-	
+		return rows	
 	
 	#Inserts transaction record for a specific account
 	def HandleAccount(AccountInfo,TransactionDate,TransactionAmount,TransactionType):
@@ -212,7 +217,7 @@ with lite.connect(DIR_PATH) as conn:
 		#insert the new account data into the appropriate table
 		if AccountType=='Real':
 			cur.execute('''INSERT INTO Real_Account (Real_Account_Balance,Real_Account_Type,Real_Account_Note)VALUES(?,?,?)''',(Balance,AccountName,AccountNote))
-		if AccountType=='Logical':
+		elif AccountType=='Logical':
 			cur.execute('''INSERT INTO Logical_Account (Logical_Account_Balance,Logical_Account_Type,Logical_Account_Note)VALUES(?,?,?)''',(Balance,AccountName,AccountNote))
 		#commit the data, and close the database
 		conn.commit()
@@ -349,6 +354,8 @@ with lite.connect(DIR_PATH) as conn:
 		conn.close()
 		
 		##Handles the transformation of account names on the database side
+	
+	
 	def RenamingAccount(ToBeChangedAccount,NewName):
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
