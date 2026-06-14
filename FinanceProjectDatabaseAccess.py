@@ -237,8 +237,21 @@ with lite.connect(DIR_PATH) as conn:
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
+		AccountType=''
+		RealAccountsList, LogicalAccountsList = AccountOverviewData()
+		for row in RealAccountsList:
+			AccountName, *OtherData = row
+			if AccountName==ToBeDeletedAccount:
+				AccountType='Real'
+				cur.execute('''DELETE FROM Real_Account WHERE Real_Account_Type=?''',(ToBeDeletedAccount,))
+				break
+		for row in LogicalAccountsList:
+			AccountName, *OtherData = row
+			if AccountName==ToBeDeletedAccount:
+				AccountType='Logical'
+				cur.execute('''DELETE FROM Logical_Account WHERE Logical_Account_Type=?''',(ToBeDeletedAccount,))
+				break
 		#delete specified account from the database,commit the deletion, close the database
-		cur.execute('''DELETE FROM Real_Account WHERE Real_Account_Type=?''',(ToBeDeletedAccount,))
 		conn.commit()
 		conn.close()
 	

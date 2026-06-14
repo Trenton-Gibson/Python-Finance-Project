@@ -176,7 +176,7 @@ class FinanceGUI:
 		self.DeleteAccountLabel=tk.Label(self.DeleteAccountFrame, text='Account Deletion')
 		self.AccountToDeleteLabel=tk.Label(self.DeleteAccountFrame, text='Account to Delete')
 		self.AccountToDeleteDropdown=ttk.Combobox(self.DeleteAccountFrame)                                                       
-		self.DeleteAccountButton=tk.Button(self.DeleteAccountFrame, text='Delete Account')
+		self.DeleteAccountButton=tk.Button(self.DeleteAccountFrame, text='Delete Account', command=self.DeleteAccount)
 		## Add Delete Account Frame Widgets
 		self.DeleteAccountLabel.grid(row=0, column=0,columnspan=2)
 		self.AccountToDeleteLabel.grid(row=1, column=0)
@@ -448,29 +448,14 @@ class FinanceGUI:
 	#Deletes an account if called
 	def DeleteAccount(self):
 		try:
-			#get data for which account to delete
-			self.selected = self.AccountsInfoTreeview.focus()
-			self.AccountToDelete= self.AccountsInfoTreeview.item(self.selected, 'values')
-			
-			#set up accumulator to end the loop when the correct tuple data is place
-			count=0
-			#processe tuple data into a usable string form
-			for item in self.AccountToDelete:
-				count+=1
-				String = str(item)
-				String = String.lstrip('(')
-				String = String.rstrip(')')
-				String = String.rstrip(',')
-				self.AccountToDelete = String
-				#loop ends when the second data value gets processed
-				if count==1:
-					break
+			self.AccountToDelete= self.AccountToDeleteDropdown.get()
 			#Calls Delete account function from the other module to interact with the database
 			FinanceProjectDatabaseAccess.DeleteAccount(self.AccountToDelete)
 			# Repopulate treeviews with data
 			self.RepopulateAccountsTreeview()
 			self.RepopulateTransactionsTreeview()
 			self.RepopulateAccountDropboxes()
+			self.AccountToDeleteDropdown.delete(0,END)
 		except:
 			# Create an error message variable
 			self.ErrorMessage ='Error! Follow the directions and please try again.'
@@ -693,7 +678,7 @@ class FinanceGUI:
 		self.TopMidFrame.grid_remove()
 		self.TrueMiddleFrame.grid_remove()
 		self.BudgetingFrame.grid(row=0,column=1)
-		RepopulateAccountDropboxes()
+		self.RepopulateAccountDropboxes()
 	
 
 	def ShowAccountManagementWidgets(self):
@@ -701,7 +686,7 @@ class FinanceGUI:
 		self.TopFrame.grid(row=0, column=1)
 		self.TopMidFrame.grid(row=1, column=1)
 		self.TrueMiddleFrame.grid(row=2, column=1)
-		RepopulateAccountDropboxes()
+		self.RepopulateAccountDropboxes()
 
 
 	def RepopulateAccountDropboxes(self):
@@ -710,15 +695,29 @@ class FinanceGUI:
 		self.RealAccountDropdown, self.LogicalAccountDropdown, self.ExpendingAccountDropdown,
 		self.RecipientAccountDropdown, self.AccountChoiceDropdown]
 		Accounts=[]
-		for row in RealAccountsList:
-			AccountName, *OtherData = row
-			Accounts.append(AccountName)
-		for dropbox in AccountDropboxList:
-			dropbox['values']=Accounts
+		RealAccounts=[]
+		LogicalAccounts=[]
 		for row in LogicalAccountsList:
 			AccountName, *OtherData = row
 			Accounts.append(AccountName)
+			LogicalAccounts.append(AccountName)
 		for dropbox in AccountDropboxList:
+			if dropbox == self.LogicalAccountDropdown:
+				dropbox['values']=LogicalAccounts
+				continue
+			elif dropbox == self.RealAccountDropdown:
+				continue
+			dropbox['values']=Accounts
+		for row in RealAccountsList:
+			AccountName, *OtherData = row
+			Accounts.append(AccountName)
+			RealAccounts.append(AccountName)
+		for dropbox in AccountDropboxList:
+			if dropbox == self.RealAccountDropdown:
+				dropbox['values']=RealAccounts
+				continue
+			elif dropbox == self.LogicalAccountDropdown:
+				continue
 			dropbox['values']=Accounts
 
 

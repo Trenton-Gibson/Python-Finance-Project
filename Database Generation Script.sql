@@ -1,7 +1,7 @@
 CREATE TABLE "Real_Account" (
 	"RealAccountID"	INTEGER NOT NULL UNIQUE,
 	"Real_Account_Balance"	NUMERIC NOT NULL,
-	"Real_Account_Type"	TEXT NOT NULL,
+	"Real_Account_Type"	TEXT NOT NULL UNIQUE,
 	"Real_Account_Note"	TEXT NOT NULL,
 	PRIMARY KEY("RealAccountID" AUTOINCREMENT)
 );
@@ -22,7 +22,7 @@ CREATE TABLE "Transaction" (
 );
 CREATE TABLE "Logical_Account" (
 	"LogicalAccountID"	INTEGER NOT NULL UNIQUE,
-	"Logical_Account_Type"	TEXT NOT NULL,
+	"Logical_Account_Type"	TEXT NOT NULL UNIQUE,
 	"Logical_Account_Balance"	NUMERIC NOT NULL,
 	"Logical_Account_Note"	TEXT NOT NULL,
 	PRIMARY KEY("LogicalAccountID" AUTOINCREMENT)
