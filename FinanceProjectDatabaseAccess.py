@@ -32,7 +32,7 @@ with lite.connect(DIR_PATH) as conn:
 			RowGroup=[]
 			#Gets a list of all the account IDs in integer form
 			AccountIDs = AccountOverviewTreeviewDataFiltering(AccountType)
-			if AccountsIDs=='':
+			if AccountIDs=='':
 				return
 			#loop acquires all data for accounts with transactionIDs
 			for item in AccountIDs:
@@ -49,12 +49,15 @@ with lite.connect(DIR_PATH) as conn:
 					MaxTransID=str(MaxTransID)
 					AddRows= tuple(WithTransIDAccountInfo(MaxTransID, AccountType))
 					RowGroup.insert(1,AddRows)
-			cur.execute('''SELECT ?_Account_Type,?_Account_Balance FROM ?_Account
-			WHERE ?AccountID NOT IN (SELECT ?AccountID FROM 'Transaction')''',(AccountType
-			,AccountType,AccountType,AccountType,AccountType,))
+			if AccountType=='Real':
+				cur.execute('''SELECT Real_Account_Type,Real_Account_Note,Real_Account_Balance FROM Real_Account
+				WHERE RealAccountID NOT IN (SELECT RealAccountID FROM 'Transaction')''')
+			elif AccountType=='Logical':
+				cur.execute('''SELECT Logical_Account_Type,Logical_Account_Note,Logical_Account_Balance FROM Logical_Account
+				WHERE LogicalAccountID NOT IN (SELECT LogicalAccountID FROM 'Transaction')''')
 			AddRows=cur.fetchall()
 			RowGroup+=AddRows
-			rows.insert(RowGroup)
+			rows.insert(1,RowGroup)
 		#close the database and return our data
 		conn.close()
 		return rows
@@ -66,8 +69,10 @@ with lite.connect(DIR_PATH) as conn:
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
 		#get all the accountIds from the database
-		if AccountType=='Real' or Account=='Logical':
-			cur.execute('''SELECT ?AccountID FROM ?_Account''', (AccountType, AccountType))
+		if AccountType=='Real':
+			cur.execute('''SELECT RealAccountID FROM Real_Account''')
+		elif AccountType=='Logical':
+			cur.execute('''SELECT LogicalAccountID FROM Logical_Account''')
 		else:
 			return ''
 		rows = list(cur.fetchall())
@@ -92,7 +97,10 @@ with lite.connect(DIR_PATH) as conn:
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
 		#get all the transactionIDs for a specific account
-		cur.execute("SELECT TransactionID FROM 'Transaction' WHERE ?AccountID=?", (AccountType,AccountID))
+		if AccountType=='Real':
+			cur.execute("SELECT TransactionID FROM 'Transaction' WHERE RealAccountID=?", (AccountID,))
+		elif AccountType=='Logical':
+			cur.execute("SELECT TransactionID FROM 'Transaction' WHERE LogicalAccountID=?", (AccountID,))
 		TransID = cur.fetchall()
 		#create a list that will be filled with TransactionIDs
 		#that have been transformed from tuple into integer
@@ -116,8 +124,7 @@ with lite.connect(DIR_PATH) as conn:
 		if TransIDList:
 			return TransIDList
 		
-		
-		
+			
 	#gets the account info for accounts with transaction records
 	def WithTransIDAccountInfo(AccountType, MaxTransID):
 		# connect to the database and make a cursor
@@ -139,6 +146,7 @@ with lite.connect(DIR_PATH) as conn:
 		conn.close()
 		return rows	
 	
+
 	#Inserts transaction record for a specific account
 	def HandleAccount(AccountInfo,TransactionDate,TransactionAmount,TransactionType):
 		# connect to the database and make a cursor
@@ -242,9 +250,11 @@ with lite.connect(DIR_PATH) as conn:
 		cur = conn.cursor()
 		# get the transaction history of all accounts if the argument some version of 'All'
 		if AccountHistory == '':
-			cur.execute("SELECT Real_Account.Real_Account_Type,'Transaction'.Real_Account_Previous_Balance,'Transaction'.Real_Account_New_Balance,"
-			"'Transaction'.Transaction_Type,'Transaction'.Money_Transferred,'Transaction'.Date_Of_Transaction "
-			"FROM Real_Account INNER JOIN 'Transaction' ON Real_Account.RealAccountID= 'Transaction'.RealAccountID")
+			cur.execute('''SELECT 'Transaction'.Transaction_Type,'Transaction'.Date_Of_Transaction,'Transaction'.Money_Transferred,
+			Real_Account.Real_Account_Type,'Transaction'.Real_Account_Previous_Balance,'Transaction'.Real_Account_New_Balance,
+			Logical_Account.Logical_Account_Type,'Transaction'.Logical_Account_Previous_Balance,'Transaction'.Logical_Account_New_Balance
+			FROM Real_Account INNER JOIN 'Transaction' ON Real_Account.RealAccountID= 'Transaction'.RealAccountID INNER JOIN Logical_Account
+			ON Logical_Account.LogicalAccountID = 'Transaction'.LogicalAccountID''')
 		#get transaction history of account specified by argument
 		else:
 			cur.execute("SELECT Real_Account.Real_Account_Type,'Transaction'.Real_Account_Previous_Balance,'Transaction'.Real_Account_New_Balance,"

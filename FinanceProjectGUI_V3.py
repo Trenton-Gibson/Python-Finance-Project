@@ -159,7 +159,7 @@ class FinanceGUI:
 		self.AccountNoteLabel = tk.Label(self.AddAccountFrame,text='Account Description')
 		self.AccountNoteEntry = tk.Entry(self.AddAccountFrame)
 		self.ChooseAccountCategoryLabel = tk.Label(self.AddAccountFrame,text='Account Category')
-		self.ChooseAccountCategoryDropbox = ttk.Combobox(self.AddAccountFrame)
+		self.ChooseAccountCategoryDropbox = ttk.Combobox(self.AddAccountFrame,values=['Real','Logical'])
 		self.CreateAccountButton=tk.Button(self.AddAccountFrame, text='Create Account', command=self.AddAccount)
 		## add the create account frame widgets
 		self.CreateAccountLabel.grid(row=0,column=0, columnspan=2,padx=10)
@@ -314,18 +314,9 @@ class FinanceGUI:
 		self.Accounts_yscroll.config(command=self.AccountsInfoTreeview.yview)
 		# self.AccountsInfoTreeview.insert()
 		## Populate treeview with data
-		rows = FinanceProjectDatabaseAccess.AccOverDataWithTransID()
-		for row in rows:
-			self.AccountsInfoTreeview.insert("", tk.END, values=row)
-		rows = FinanceProjectDatabaseAccess.AccOverDataWithoutTransID()
-		for row in rows:
-			self.AccountsInfoTreeview.insert("", tk.END, values=row)
-		row=("1","k","k","","","","")
-		row2=("","","","k","k","k","k")
-		for i in range(20):
-			id2=self.TransHisTransactionInfo.insert("", tk.END, values=row)
-			self.TransHisTransactionInfo.insert(id2, tk.END, values=row2)
-		
+		self.RepopulateAccountsTreeview()
+
+
 		# Create Transaction Info treeview
 		#Create Transaction table widget
 		self.TransactionHistoryLabel=tk.Label(self.TransactionTreeviewFrame, text="Transaction Table")
@@ -365,16 +356,13 @@ class FinanceGUI:
 		rows = FinanceProjectDatabaseAccess.AccountTransactionHistory(self.StartAccountHistory)
 		for row in rows:
 			self.TransHisTransactionInfo.insert("", tk.END, values=row)
-		row=("1","k","k","","","","")
-		row2=("","","","k","k","k","k")
-		for i in range(20):
-			id2=self.TransHisTransactionInfo.insert("", tk.END, values=row)
-			self.TransHisTransactionInfo.insert(id2, tk.END, values=row2)
 		# Change the style of the Treeviews
 		style = ttk.Style()
 		style.configure("Treeview.Heading", fieldbackground='#9613bb', )
 		style.configure("Treeview", )
 		style.configure("Treeview", foreground='yellow', background='#9613bb')
+
+		self.RepopulateAccountDropboxes()
 
 		# Start the mainloop
 		tk.mainloop()
@@ -431,7 +419,7 @@ class FinanceGUI:
 			self.IntialBalance = self.IntialBalanceEntry.get()
 			self.IntialBalance = float(self.IntialBalance)
 			self.AccountDescription = self.AccountNoteEntry.get()
-			self.AccountCategory = self.ChooseAccountCategoryDropdown.get()
+			self.AccountCategory = self.ChooseAccountCategoryDropbox.get()
 			# If any of the entries are unpopulated, it sends an error message and the core code isn't executed
 			if self.AccountName == '' or self.IntialBalance == '' or self.AccountCategory == '':
 				# Create an error message variable
@@ -447,6 +435,9 @@ class FinanceGUI:
 				self.RepopulateTransactionsTreeview()
 				self.NameAccountEntry.delete(0,END)
 				self.IntialBalanceEntry.delete(0,END)
+				self.AccountNoteEntry.delete(0,END)
+				self.ChooseAccountCategoryDropbox.delete(0,END)
+				self.RepopulateAccountDropboxes()
 		except:
 			# Create an error message variable
 			self.ErrorMessage ='Error! Follow the directions and please try again.'
@@ -479,6 +470,7 @@ class FinanceGUI:
 			# Repopulate treeviews with data
 			self.RepopulateAccountsTreeview()
 			self.RepopulateTransactionsTreeview()
+			self.RepopulateAccountDropboxes()
 		except:
 			# Create an error message variable
 			self.ErrorMessage ='Error! Follow the directions and please try again.'
@@ -624,8 +616,6 @@ class FinanceGUI:
 		RealAccountsList, LogicalAccountsList = FinanceProjectDatabaseAccess.AccountOverviewData()
 		for row in RealAccountsList:
 			self.AccountsInfoTreeview.insert(RealAccounts, -1, values=row)
-		# obtain data for accounts without transactions recorded and add the data to the treeview
-		rows = FinanceProjectDatabaseAccess.AccOverDataWithoutTransID()
 		for row in LogicalAccountsList:
 			self.AccountsInfoTreeview.insert(LogicalAccounts, -1, values=row)
 			
@@ -635,12 +625,20 @@ class FinanceGUI:
 		#get the transaction history for all the accounts
 		TransactionAccountHistory = FinanceProjectDatabaseAccess.AccountTransactionHistory(self.StartAccountHistory)
 		#clear the transaction treeview
-		for item in self.TransHisTransactionInfo.get_children():
+		for item in self.TransHisTransactionInfo.get_children():	
 			self.TransHisTransactionInfo.delete(item)
 		#Insert new transaction treeview data into the transaction treeview
 		for row in TransactionAccountHistory:
-			self.TransHisTransactionInfo.insert("", tk.END, values=row)
-	
+			TransactionType,TransactionDate,TransactionAmount, 
+			RealAccountName, RealPreviousBalance, RealCurrentBalance,
+			LogicalAccountName, LogicalPreviousBalance, LogicalCurrentBalance=row
+			TransactionRow=self.TransHisTransactionInfo.insert("", tk.END,
+			values=(TransactionType,TransactionDate,TransactionAmount,"","","",""))
+			self.TransHisTransactionInfo.insert(TransactionRow, tk.END,
+			values=("","","","Real",RealAccountName,RealPreviousBalance,RealCurrentBalance))
+			self.TransHisTransactionInfo.insert(TransactionRow, tk.END,
+			values=("","","","Logical",LogicalAccountName,LogicalPreviousBalance,LogicalCurrentBalance))
+
 
 	def ResetTransHisTree(self):
 		#make account history an empty string to reset the treeview
@@ -682,6 +680,7 @@ class FinanceGUI:
 				FinanceProjectDatabaseAccess.RenamingAccount(self.ToBeRenamedAccount,self.NewName)
 				self.RepopulateAccountsTreeview()
 				self.RenameAccountEntry.delete(0, END)
+				self.RepopulateAccountDropboxes()
 		except:
 			# Create an error message variable
 			self.ErrorMessage = 'Error! Follow the directions and please try again.'
@@ -694,13 +693,34 @@ class FinanceGUI:
 		self.TopMidFrame.grid_remove()
 		self.TrueMiddleFrame.grid_remove()
 		self.BudgetingFrame.grid(row=0,column=1)
+		RepopulateAccountDropboxes()
 	
-	
+
 	def ShowAccountManagementWidgets(self):
 		self.BudgetingFrame.grid_remove()
 		self.TopFrame.grid(row=0, column=1)
 		self.TopMidFrame.grid(row=1, column=1)
 		self.TrueMiddleFrame.grid(row=2, column=1)
+		RepopulateAccountDropboxes()
+
+
+	def RepopulateAccountDropboxes(self):
+		RealAccountsList, LogicalAccountsList = FinanceProjectDatabaseAccess.AccountOverviewData()
+		AccountDropboxList=[self.AccountToDeleteDropdown, self.AccountToRenameDropdown, 
+		self.RealAccountDropdown, self.LogicalAccountDropdown, self.ExpendingAccountDropdown,
+		self.RecipientAccountDropdown, self.AccountChoiceDropdown]
+		Accounts=[]
+		for row in RealAccountsList:
+			AccountName, *OtherData = row
+			Accounts.append(AccountName)
+		for dropbox in AccountDropboxList:
+			dropbox['values']=Accounts
+		for row in LogicalAccountsList:
+			AccountName, *OtherData = row
+			Accounts.append(AccountName)
+		for dropbox in AccountDropboxList:
+			dropbox['values']=Accounts
+
 
 # Call the Finance GUI Class
 if __name__ == '__main__':
