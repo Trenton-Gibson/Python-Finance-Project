@@ -682,6 +682,7 @@ class FinanceGUI:
 
 
 	def RepopulateAccountDropboxes(self):
+
 		RealAccountsList, LogicalAccountsList = FinanceProjectDatabaseAccess.AccountOverviewData()
 		AccountDropboxList=[self.AccountToDeleteDropdown, self.AccountToRenameDropdown, 
 		self.RealAccountDropdown, self.LogicalAccountDropdown, self.ExpendingAccountDropdown,
@@ -711,6 +712,15 @@ class FinanceGUI:
 			elif dropbox == self.LogicalAccountDropdown:
 				continue
 			dropbox['values']=Accounts
+
+
+	def CreateBudget(self):
+		self.CreateBudgetLabel=tk.Label(self.CreateBudgetFrame, text="Budget Creation")
+		self.BudgetNameLabel=tk.Label(self.CreateBudgetFrame, text="Budget Name")
+		self.BudgetNameField=tk.Entry(self.CreateBudgetFrame)
+		self.BudgetDescriptionLabel=tk.Label(self.CreateBudgetFrame, text="Budget Description")
+		self.BudgetDescriptionField=tk.Entry(self.CreateBudgetFrame)
+		self.CreateBudgetButton=tk.Button(self.CreateBudgetFrame, text="Create Budget")
 
 
 # Call the Finance GUI Class
