@@ -237,18 +237,15 @@ with lite.connect(DIR_PATH) as conn:
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
-		AccountType=''
 		RealAccountsList, LogicalAccountsList = AccountOverviewData()
 		for row in RealAccountsList:
 			AccountName, *OtherData = row
 			if AccountName==ToBeDeletedAccount:
-				AccountType='Real'
 				cur.execute('''DELETE FROM Real_Account WHERE Real_Account_Type=?''',(ToBeDeletedAccount,))
 				break
 		for row in LogicalAccountsList:
 			AccountName, *OtherData = row
 			if AccountName==ToBeDeletedAccount:
-				AccountType='Logical'
 				cur.execute('''DELETE FROM Logical_Account WHERE Logical_Account_Type=?''',(ToBeDeletedAccount,))
 				break
 		#delete specified account from the database,commit the deletion, close the database
@@ -379,12 +376,32 @@ with lite.connect(DIR_PATH) as conn:
 		##Handles the transformation of account names on the database side
 	
 	
-	def RenamingAccount(ToBeChangedAccount,NewName):
+	def RenamingAccount(ToBeChangedAccount,NewName,NewDescription):
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
+		RealAccountsList, LogicalAccountsList = AccountOverviewData()
+		for row in RealAccountsList:
+			AccountName, *OtherData = row
+			if AccountName==ToBeChangedAccount and NewDescription != '':
+				cur.execute('''UPDATE Real_Account SET Real_Account_Type=?, Real_Account_Note=? WHERE Real_Account_Type=?'''
+				,(NewName, NewDescription, ToBeChangedAccount))
+				break
+			elif AccountName==ToBeChangedAccount:
+				cur.execute('''UPDATE Real_Account SET Real_Account_Type=? WHERE Real_Account_Type=?'''
+				,(NewName, ToBeChangedAccount))
+				break
+		for row in LogicalAccountsList:
+			AccountName, *OtherData = row
+			if AccountName==ToBeChangedAccount and NewDescription != '':
+				cur.execute('''UPDATE Logical_Account SET Logical_Account_Type=?, Logical_Account_Note=? WHERE Logical_Account_Type=?'''
+				,(NewName, NewDescription, ToBeChangedAccount))
+				break
+			elif AccountName==ToBeChangedAccount:
+				cur.execute('''UPDATE Logical_Account SET Logical_Account_Type=? WHERE Logical_Account_Type=?'''
+				,(NewName, ToBeChangedAccount))
+				break
 		#update the account name for the selected account
-		cur.execute('''UPDATE Real_Account SET Real_Account_Type=? WHERE Real_Account_Type=?''',(NewName,ToBeChangedAccount))
 		#commit the transaction and close the database
 		conn.commit()
 		conn.close

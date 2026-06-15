@@ -190,7 +190,7 @@ class FinanceGUI:
 		self.NewAccountNameField=tk.Entry(self.RenameAccountFrame)
 		self.RevisedAccountDescriptionLabel=tk.Label(self.RenameAccountFrame,text='Revised Account Description (Optional)')
 		self.RevisedAccountDescriptionField=tk.Entry(self.RenameAccountFrame)
-		self.RenameAccountButton=tk.Button(self.RenameAccountFrame, text='Rename Account')
+		self.RenameAccountButton=tk.Button(self.RenameAccountFrame, text='Rename Account', command=self.RenameAccount)
 		## Add Widgets for Account Renaming Frame
 		self.AccountRenamingLabel.grid(row=0, column=0, columnspan=2)
 		self.AccountToRenameLabel.grid(row=1, column=0)
@@ -640,37 +640,29 @@ class FinanceGUI:
 
 	##Renames the account of your choosing to whatever you put in the entry
 	def RenameAccount(self):
-		try:
+		# try:
 			#get the new name for the account and find the name of the account you wish to change
-			self.NewName = self.RenameAccountEntry.get()
-			self.selected = self.AccountsInfoTreeview.focus()
-			self.ToBeRenamedAccount = self.AccountsInfoTreeview.item(self.selected, 'values')
+			self.NewName = self.NewAccountNameField.get()
+			self.ToBeRenamedAccount = self.AccountToRenameDropdown.get()
+			self.NewDescription = self.RevisedAccountDescriptionField.get()
 			if self.NewName == '' or self.ToBeRenamedAccount == '':
 				# Create an error message variable
 				self.ErrorMessage = 'Error! Follow the directions and please try again.'
 				# Display the error message in an info dialog box.
 				tk.messagebox.showinfo('Error!', self.ErrorMessage)
 			else:
-				#this section turns the tuple from the treeview into a string
-				# start accumulator to act as a trigger to end the loop early so the needed value can be obtained
-				count = 0
-				# process tuple data into string data
-				for item in self.ToBeRenamedAccount:
-					count += 1
-					String = str(item)
-					self.ToBeRenamedAccount = String
-					# end the loop when the correct value is in play
-					if count == 1:
-						break
-				FinanceProjectDatabaseAccess.RenamingAccount(self.ToBeRenamedAccount,self.NewName)
+				FinanceProjectDatabaseAccess.RenamingAccount(self.ToBeRenamedAccount,self.NewName,
+				self.NewDescription)
 				self.RepopulateAccountsTreeview()
-				self.RenameAccountEntry.delete(0, END)
+				self.NewAccountNameField.delete(0, END)
+				self.AccountToRenameDropdown.delete(0, END)
+				self.RevisedAccountDescriptionField.delete(0, END)
 				self.RepopulateAccountDropboxes()
-		except:
-			# Create an error message variable
-			self.ErrorMessage = 'Error! Follow the directions and please try again.'
-			# Display the error message in an info dialog box.
-			tk.messagebox.showinfo('Error!', self.ErrorMessage)
+		# except:
+		# 	# Create an error message variable
+		# 	self.ErrorMessage = 'Error! Follow the directions and please try again.'
+		# 	# Display the error message in an info dialog box.
+		# 	tk.messagebox.showinfo('Error!', self.ErrorMessage)
 
 
 	def ShowBudgetingWidgets(self):
