@@ -405,3 +405,13 @@ with lite.connect(DIR_PATH) as conn:
 		#commit the transaction and close the database
 		conn.commit()
 		conn.close
+
+	def AddBudget(BudgetName, BudgetDescription):
+		# connect to the database and make a cursor
+		conn = lite.connect(DIR_PATH)
+		cur = conn.cursor()
+		#insert the new budget  into the appropriate table
+		cur.execute('''INSERT INTO Budget (Budget_Name,Budget_Note)VALUES(?,?)''',(BudgetName,BudgetDescription))
+		#commit the data, and close the database
+		conn.commit()
+		conn.close()

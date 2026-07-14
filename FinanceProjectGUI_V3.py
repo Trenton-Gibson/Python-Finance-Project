@@ -73,7 +73,7 @@ class FinanceGUI:
 		self.BudgetNameField=tk.Entry(self.CreateBudgetFrame)
 		self.BudgetDescriptionLabel=tk.Label(self.CreateBudgetFrame, text="Budget Description")
 		self.BudgetDescriptionField=tk.Entry(self.CreateBudgetFrame)
-		self.CreateBudgetButton=tk.Button(self.CreateBudgetFrame, text="Create Budget")
+		self.CreateBudgetButton=tk.Button(self.CreateBudgetFrame, text="Create Budget", command=self.CreateBudget)
 		## Add widgets to create budget frame
 		self.CreateBudgetLabel.grid(row=1, column=0)
 		self.BudgetNameLabel.grid(row=0, column=1)
@@ -715,12 +715,9 @@ class FinanceGUI:
 
 
 	def CreateBudget(self):
-		self.CreateBudgetLabel=tk.Label(self.CreateBudgetFrame, text="Budget Creation")
-		self.BudgetNameLabel=tk.Label(self.CreateBudgetFrame, text="Budget Name")
-		self.BudgetNameField=tk.Entry(self.CreateBudgetFrame)
-		self.BudgetDescriptionLabel=tk.Label(self.CreateBudgetFrame, text="Budget Description")
-		self.BudgetDescriptionField=tk.Entry(self.CreateBudgetFrame)
-		self.CreateBudgetButton=tk.Button(self.CreateBudgetFrame, text="Create Budget")
+		BudgetName=self.BudgetNameField
+		BudgetDescription=self.BudgetDescriptionField
+		FinanceProjectDatabaseAccess.AddBudget(BudgetName,BudgetDescription)
 
 
 # Call the Finance GUI Class
