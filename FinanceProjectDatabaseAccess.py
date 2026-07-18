@@ -458,19 +458,31 @@ with lite.connect(DIR_PATH) as conn:
 		#Get the ID for desired budget allocation based off the fact that its the most recent
 		cur.execute('''SELECT MAX(BudgetAllocationID) FROM Budget_Allocation''')
 		BudgetAllocationID=cur.fetchall()
+		BudgetAllocationID=BudgetAllocationID[0]
+		BudgetAllocationID=TupleToString(BudgetAllocationID)
 		#Get the ID for the desired budget based off the budget name
-		cur.execute('''SELECT BudgetID from Budget WHERE BudgetName=?''', (BudgetName))
+		cur.execute('''SELECT BudgetID from Budget WHERE Budget_Name=?''', (BudgetName,))
 		# this will retrieve the desired BudgetID whilst not returning any data from
 		# the following query if .fetchall() is used again before closing the database
 		# connection.
 		BudgetID=cur.fetchall()
+		BudgetID=BudgetID[0]
+		BudgetID=TupleToString(BudgetID)
 		#Get the ID for the desired budget based off the budget name
-		cur.execute('''SELECT LogicalAccountID from LogicalAccount WHERE LogicalAccountType=?''', (LogicalAccountName,))
+		cur.execute('''SELECT LogicalAccountID FROM Logical_Account WHERE Logical_Account_Type=?''', (LogicalAccountName,))
 		LogicalAccountID=cur.fetchall()
+		LogicalAccountID=LogicalAccountID[0]
+		LogicalAccountID=TupleToString(LogicalAccountID)
 		# Insert the new budget item into the Budget_Item table
-		cur.execute('''INSERT INTO Budget_Item (BudgetID, LogicalAccountID, BudgetAllocationID,BudgetItemNote)VALUES(?,?,?,?)''', 
+		cur.execute('''INSERT INTO Budget_Item (BudgetID, LogicalAccountID, BudgetAllocationID,Budget_Item_Note)VALUES(?,?,?,?)''', 
 			(BudgetID,LogicalAccountID,BudgetAllocationID,BudgetItemNote))
 		conn.commit()
 		#close the database and return rows
 		conn.close()
-		return rows	
+	
+	def TupleToString(strng):
+		strng=str(strng)
+		strng=strng.rstrip(")")
+		strng=strng.lstrip("(")
+		strng=strng.rstrip(",")
+		return strng

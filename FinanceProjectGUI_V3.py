@@ -680,6 +680,21 @@ class FinanceGUI:
 		self.TrueMiddleFrame.grid_remove()
 		self.BudgetingFrame.grid(row=0,column=1)
 		self.RepopulateBudgetDropbox()
+		RealAccountsList, LogicalAccountsList = FinanceProjectDatabaseAccess.AccountOverviewData()
+		LogicalAccountNames=[]
+		for row in LogicalAccountsList:
+			row=str(row)
+			row=row.rstrip(")")
+			row=row.lstrip("(")
+			row=row.split(",")
+			Name=row[0]
+			Name=Name.strip("'")
+			LogicalAccountNames.append(Name)
+		self.EditBudgetLogicalDropdown['values']=LogicalAccountNames
+		TypesToAdd=[]
+		for typetoadd in BudgetAllocationTypes:
+			TypesToAdd.append(typetoadd.value)
+		self.BudgetAllocationTypeDropdown['values']=TypesToAdd
 	
 
 	def ShowAccountManagementWidgets(self):
@@ -736,7 +751,7 @@ class FinanceGUI:
 		self.BudgetEditingDropdown['values'] = BudgetNames 
 
 
-	def ResetBudgetTree(self, event):
+	def ResetBudgetTree(self,event):
 		selected_value = self.BudgetDropdownChoice.get()
 		#get the budget items from the other module
 		BudgetItems = FinanceProjectDatabaseAccess.GetBudgetItems(selected_value)
@@ -754,7 +769,7 @@ class FinanceGUI:
 		BudgetAllocationAmount=self.BudgetAllocationAmountField.get()
 		BudgetItemNote=self.BudgetItemNoteField.get()
 		FinanceProjectDatabaseAccess.AddBudgetItem(BudgetName, LogicalAccountName, BudgetAllocationType, BudgetAllocationAmount, BudgetItemNote)
-		self.ResetBudgetTree()
+		self.ResetBudgetTree("event")
 
 # Call the Finance GUI Class
 if __name__ == '__main__':
