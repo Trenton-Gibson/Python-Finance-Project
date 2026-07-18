@@ -84,7 +84,9 @@ class FinanceGUI:
 		## Create Widgets for Edit Budget Frame
 		self.BudgetEditingAndViewingLabel=tk.Label(self.EditBudgetFrame, text="Budget Editing and Viewing")
 		self.BudgetEditingDropdownLabel=tk.Label(self.EditBudgetFrame, text="Budget to Edit or View")
-		self.BudgetEditingDropdown=ttk.Combobox(self.EditBudgetFrame)
+		self.BudgetDropdownChoice = tk.StringVar()
+		self.BudgetEditingDropdown=ttk.Combobox(self.EditBudgetFrame, textvariable = self.BudgetDropdownChoice)
+		self.BudgetEditingDropdown.bind("<<ComboboxSelected>>", self.ResetBudgetTree)
 		self.AddNewBudgetItemLabel=tk.Label(self.EditBudgetFrame, text="Add new button budget item below!")
 		self.EditBudgetLogicalDropdownLabel=tk.Label(self.EditBudgetFrame,text="Logical Account")
 		self.EditBudgetLogicalDropdown=ttk.Combobox(self.EditBudgetFrame)
@@ -100,20 +102,18 @@ class FinanceGUI:
 												 columns=('column1', 'column2', 'column3', 'column4'),
 												 show='tree headings', yscrollcommand=self.Budget_yscroll.set)
 		##Define and create the columns for the Account Treeview
-		self.BudgetInfoTreeview['columns'] = ('Logical Account', 'Budget Allocation Type', 'Budget Allocation Amount','Budget Item Note')
-		self.BudgetInfoTreeview.column("#0",width=20)   
-		self.BudgetInfoTreeview.column('Logical Account', width=100)
-		self.BudgetInfoTreeview.heading("#1", text="Logical Account")
-		self.BudgetInfoTreeview.column('Budget Allocation Type', width=100)
-		self.BudgetInfoTreeview.heading("#2", text="Budget Allocation Type")
-		self.BudgetInfoTreeview.column('Budget Allocation Amount', width=100)
-		self.BudgetInfoTreeview.heading("#3", text="Budget Allocation Amount")
-		self.BudgetInfoTreeview.column('Budget Item Note', width=100)
-		self.BudgetInfoTreeview.heading("#4", text="Budget Item Note")
-		row=("1","k","k","k")
-		for i in range(20):
-			id2=self.BudgetInfoTreeview.insert("", tk.END, values=row)
-			self.BudgetInfoTreeview.insert(id2, tk.END, values=row)
+		self.BudgetInfoTreeview['columns'] = ('Budget Name', 'Logical Account', 'Budget Allocation Type', 'Budget Allocation Amount','Budget Item Note')
+		self.BudgetInfoTreeview.column("#0",width=20)
+		self.BudgetInfoTreeview.column('Budget Name', width=80)
+		self.BudgetInfoTreeview.heading("#1", text="Budget Name")
+		self.BudgetInfoTreeview.column('Logical Account', width=80)
+		self.BudgetInfoTreeview.heading("#2", text="Logical Account")
+		self.BudgetInfoTreeview.column('Budget Allocation Type', width=80)
+		self.BudgetInfoTreeview.heading("#3", text="Budget Allocation Type")
+		self.BudgetInfoTreeview.column('Budget Allocation Amount', width=80)
+		self.BudgetInfoTreeview.heading("#4", text="Budget Allocation Amount")
+		self.BudgetInfoTreeview.column('Budget Item Note', width=80)
+		self.BudgetInfoTreeview.heading("#5", text="Budget Item Note")
 		self.Budget_yscroll.config(command=self.BudgetInfoTreeview.yview)
 		self.BudgetStatsLabel=tk.Label(self.EditBudgetFrame,
 			text="Total Budget Allocation:      Unallocated Funds:           Percentage of Funds Unallocated:        Funds Allocated to the Remainder:")
@@ -670,7 +670,7 @@ class FinanceGUI:
 		self.TopMidFrame.grid_remove()
 		self.TrueMiddleFrame.grid_remove()
 		self.BudgetingFrame.grid(row=0,column=1)
-		self.RepopulateAccountDropboxes()
+		self.RepopulateBudgetDropbox()
 	
 
 	def ShowAccountManagementWidgets(self):
@@ -682,7 +682,6 @@ class FinanceGUI:
 
 
 	def RepopulateAccountDropboxes(self):
-
 		RealAccountsList, LogicalAccountsList = FinanceProjectDatabaseAccess.AccountOverviewData()
 		AccountDropboxList=[self.AccountToDeleteDropdown, self.AccountToRenameDropdown, 
 		self.RealAccountDropdown, self.LogicalAccountDropdown, self.ExpendingAccountDropdown,
@@ -718,7 +717,23 @@ class FinanceGUI:
 		BudgetName=self.BudgetNameField.get()
 		BudgetDescription=self.BudgetDescriptionField.get()
 		FinanceProjectDatabaseAccess.AddBudget(BudgetName,BudgetDescription)
-		print("done")
+		self.BudgetNameField.delete(0, END)
+		self.BudgetDescriptionField.delete(0, END)
+		self.RepopulateBudgetDropbox()
+
+	def RepopulateBudgetDropbox(self):
+		BudgetNames=FinanceProjectDatabaseAccess.GetBudgets()
+		self.BudgetEditingDropdown['values'] = BudgetNames 
+
+	def ResetBudgetTree(self, event):
+		selected_value = self.BudgetDropdownChoice.get()
+		#get the budget items from the other module
+		BudgetItems = FinanceProjectDatabaseAccess.GetBudgetItems(selected_value)
+		# clear the data out and replace it with the requested data
+		for item in self.BudgetInfoTreeview.get_children():
+			self.BudgetInfoTreeview.delete(item)
+		for row in BudgetItems:
+			self.BudgetInfoTreeview.insert("", tk.END, values=row)
 
 
 # Call the Finance GUI Class

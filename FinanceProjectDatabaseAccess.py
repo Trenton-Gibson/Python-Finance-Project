@@ -406,6 +406,7 @@ with lite.connect(DIR_PATH) as conn:
 		conn.commit()
 		conn.close
 
+
 	def AddBudget(BudgetName, BudgetDescription):
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
@@ -415,3 +416,32 @@ with lite.connect(DIR_PATH) as conn:
 		#commit the data, and close the database
 		conn.commit()
 		conn.close()
+
+
+	def GetBudgets():
+		# connect to the database and make a cursor
+		conn = lite.connect(DIR_PATH)
+		cur = conn.cursor()
+		#Get the budget items for specified budget
+		cur.execute('''SELECT Budget_Name FROM Budget''')
+		# Fetch the rows from the SELECT query
+		rows = cur.fetchall()
+		#close the database and return rows
+		conn.close()
+		return rows	
+	
+
+	def GetBudgetItems(BudgetName):
+		# connect to the database and make a cursor
+		conn = lite.connect(DIR_PATH)
+		cur = conn.cursor()
+		#Get the budget items for specified budget
+		cur.execute('''SELECT Budget.Budget_Name, Logical_Account.Logical_Account_Type, Budget_Allocation.Budget_Allocation_Type, Budget_Allocation.Budget_Allocation_Amount,
+		Budget_Item.Budget_Item_Note FROM Budget_Item INNER JOIN Logical_Account ON Budget_Item.LogicalAccountID = Logical_Account.LogicalAccountID
+		INNER JOIN Budget_Allocation ON Budget_Item.BudgetAllocationID = Budget_Allocation.BudgetAllocationID
+		INNER JOIN Budget ON Budget_Item.BudgetID = Budget.BudgetID  WHERE Budget.Budget_Name=?''', (BudgetName,))
+		# Fetch the rows from the SELECT query
+		rows = cur.fetchall()
+		#close the database and return rows
+		conn.close()
+		return rows	
