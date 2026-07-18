@@ -11,7 +11,13 @@ import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
+from enum import StrEnum
 import FinanceProjectDatabaseAccess
+class BudgetAllocationTypes(StrEnum):
+	PERCENTAGE="Percentage"
+	FIXED="Fixed"
+	REMAINDER="Remainder"
+
 # Create Finance GUI class
 class FinanceGUI:
 	def __init__(self):
@@ -84,6 +90,9 @@ class FinanceGUI:
 		## Create Widgets for Edit Budget Frame
 		self.BudgetEditingAndViewingLabel=tk.Label(self.EditBudgetFrame, text="Budget Editing and Viewing")
 		self.BudgetEditingDropdownLabel=tk.Label(self.EditBudgetFrame, text="Budget to Edit or View")
+		# The following 3 lines, respectively, create a variable to store the selected of the
+		# Budget Editing Dropdown, create the BudgetEditingDropdown with that previously created variable,
+		# and bind the action of selecting an option in the combobox to the ResetBudgetTree method.
 		self.BudgetDropdownChoice = tk.StringVar()
 		self.BudgetEditingDropdown=ttk.Combobox(self.EditBudgetFrame, textvariable = self.BudgetDropdownChoice)
 		self.BudgetEditingDropdown.bind("<<ComboboxSelected>>", self.ResetBudgetTree)
@@ -95,8 +104,8 @@ class FinanceGUI:
 		self.BudgetAllocationAmountLabel=tk.Label(self.EditBudgetFrame, text="Budget Allocation Amount")
 		self.BudgetAllocationAmountField=tk.Entry(self.EditBudgetFrame)
 		self.BudgetItemNoteLabel=tk.Label(self.EditBudgetFrame, text="Budget Item Note")
-		self.BudgetItemNoteField=ttk.Combobox(self.EditBudgetFrame)
-		self.CreateBudgetItemButton=tk.Button(self.EditBudgetFrame, text="Create Budget Item")
+		self.BudgetItemNoteField=ttk.Entry(self.EditBudgetFrame)
+		self.CreateBudgetItemButton=tk.Button(self.EditBudgetFrame, text="Create Budget Item", command=self.AddBudgetItem)
 		self.Budget_yscroll = Scrollbar(self.EditBudgetFrame)
 		self.BudgetInfoTreeview = ttk.Treeview(self.EditBudgetFrame, height=10,
 												 columns=('column1', 'column2', 'column3', 'column4'),
@@ -120,7 +129,7 @@ class FinanceGUI:
 		self.SaveandExitButton=tk.Button(self.EditBudgetFrame, text="Save and Exit")
 		self.DeleteItemButtonTutorial=tk.Label(self.EditBudgetFrame,
 			text="If you wish to delete a budget item, click on said budget item in the viewing table and press the Delete Budget Item button to remove the unvwanted budget item.")
-		self.DeleteItemButton=tk.Button(self.EditBudgetFrame, text="Delete Item Budget")
+		self.DeleteItemButton=tk.Button(self.EditBudgetFrame, text="Delete Budget Item")
 		## Add widgets to Edit Budget Frame
 		self.BudgetEditingAndViewingLabel.grid(row=0,column=0,columnspan=3)
 		self.BudgetEditingDropdownLabel.grid(row=0,column=3)
@@ -175,7 +184,7 @@ class FinanceGUI:
 		## Create Delete Account Frame Widgets
 		self.DeleteAccountLabel=tk.Label(self.DeleteAccountFrame, text='Account Deletion')
 		self.AccountToDeleteLabel=tk.Label(self.DeleteAccountFrame, text='Account to Delete')
-		self.AccountToDeleteDropdown=ttk.Combobox(self.DeleteAccountFrame)                                                       
+		self.AccountToDeleteDropdown=ttk.Combobox(self.DeleteAccountFrame)
 		self.DeleteAccountButton=tk.Button(self.DeleteAccountFrame, text='Delete Account', command=self.DeleteAccount)
 		## Add Delete Account Frame Widgets
 		self.DeleteAccountLabel.grid(row=0, column=0,columnspan=2)
@@ -721,9 +730,11 @@ class FinanceGUI:
 		self.BudgetDescriptionField.delete(0, END)
 		self.RepopulateBudgetDropbox()
 
+
 	def RepopulateBudgetDropbox(self):
 		BudgetNames=FinanceProjectDatabaseAccess.GetBudgets()
 		self.BudgetEditingDropdown['values'] = BudgetNames 
+
 
 	def ResetBudgetTree(self, event):
 		selected_value = self.BudgetDropdownChoice.get()
@@ -735,6 +746,15 @@ class FinanceGUI:
 		for row in BudgetItems:
 			self.BudgetInfoTreeview.insert("", tk.END, values=row)
 
+
+	def AddBudgetItem(self):
+		BudgetName=self.BudgetEditingDropdown.get()
+		LogicalAccountName=self.EditBudgetLogicalDropdown.get()
+		BudgetAllocationType=self.BudgetAllocationTypeDropdown.get()
+		BudgetAllocationAmount=self.BudgetAllocationAmountField.get()
+		BudgetItemNote=self.BudgetItemNoteField.get()
+		FinanceProjectDatabaseAccess.AddBudgetItem(BudgetName, LogicalAccountName, BudgetAllocationType, BudgetAllocationAmount, BudgetItemNote)
+		self.ResetBudgetTree()
 
 # Call the Finance GUI Class
 if __name__ == '__main__':

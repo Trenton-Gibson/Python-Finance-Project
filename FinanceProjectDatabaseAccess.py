@@ -411,7 +411,7 @@ with lite.connect(DIR_PATH) as conn:
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
-		#insert the new budget  into the appropriate table
+		#insert the new budget into the appropriate table
 		cur.execute('''INSERT INTO Budget (Budget_Name,Budget_Note)VALUES(?,?)''',(BudgetName,BudgetDescription))
 		#commit the data, and close the database
 		conn.commit()
@@ -442,6 +442,35 @@ with lite.connect(DIR_PATH) as conn:
 		INNER JOIN Budget ON Budget_Item.BudgetID = Budget.BudgetID  WHERE Budget.Budget_Name=?''', (BudgetName,))
 		# Fetch the rows from the SELECT query
 		rows = cur.fetchall()
+		#close the database and return rows
+		conn.close()
+		return rows	
+	
+
+	def AddBudgetItem(BudgetName, LogicalAccountName, BudgetAllocationType, BudgetAllocationAmount, BudgetItemNote):
+		# connect to the database and make a cursor
+		conn = lite.connect(DIR_PATH)
+		cur = conn.cursor()
+		# Insert the new budget allocation entry into the Budget_Allocation table
+		cur.execute('''INSERT INTO Budget_Allocation (Budget_Allocation_Type, Budget_Allocation_Amount)VALUES(?,?)'''
+			,(BudgetAllocationType,BudgetAllocationAmount))
+		conn.commit()
+		#Get the ID for desired budget allocation based off the fact that its the most recent
+		cur.execute('''SELECT MAX(BudgetAllocationID) FROM Budget_Allocation''')
+		BudgetAllocationID=cur.fetchall()
+		#Get the ID for the desired budget based off the budget name
+		cur.execute('''SELECT BudgetID from Budget WHERE BudgetName=?''', (BudgetName))
+		# this will retrieve the desired BudgetID whilst not returning any data from
+		# the following query if .fetchall() is used again before closing the database
+		# connection.
+		BudgetID=cur.fetchall()
+		#Get the ID for the desired budget based off the budget name
+		cur.execute('''SELECT LogicalAccountID from LogicalAccount WHERE LogicalAccountType=?''', (LogicalAccountName,))
+		LogicalAccountID=cur.fetchall()
+		# Insert the new budget item into the Budget_Item table
+		cur.execute('''INSERT INTO Budget_Item (BudgetID, LogicalAccountID, BudgetAllocationID,BudgetItemNote)VALUES(?,?,?,?)''', 
+			(BudgetID,LogicalAccountID,BudgetAllocationID,BudgetItemNote))
+		conn.commit()
 		#close the database and return rows
 		conn.close()
 		return rows	

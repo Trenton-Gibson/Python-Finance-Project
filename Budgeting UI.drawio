@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2026-07-18T16:02:47.490Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.8 Chrome/114.0.5735.289 Electron/25.5.0 Safari/537.36" etag="LuIYg-3voeTJGe29l1Se" version="21.6.8" type="device" pages="3">
+<mxfile host="Electron" modified="2026-07-18T18:04:34.202Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.8 Chrome/114.0.5735.289 Electron/25.5.0 Safari/537.36" etag="CC2_t_0ViiY32OvzT8o2" version="21.6.8" type="device" pages="3">
   <diagram id="e9vRKVET7do9AkayF3Nr" name="Improved Main Page UI Rought Draft">
-    <mxGraphModel dx="2126" dy="1706" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1583" dy="1747" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -654,7 +654,7 @@
         <mxCell id="XdC7Ak8XQNGJ8gn5UBsQ-4" value="Budget Item&lt;br&gt;Note" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="510" y="460" width="335" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="zM1icCKLoCZLi0Cra-b2-1" value="Logical&lt;br&gt;Account" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="zM1icCKLoCZLi0Cra-b2-1" value="Budget Name" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry y="460" width="130" height="60" as="geometry" />
         </mxCell>
       </root>
