@@ -407,12 +407,12 @@ with lite.connect(DIR_PATH) as conn:
 		conn.close
 
 
-	def AddBudget(BudgetName, BudgetDescription):
+	def AddBudget(BudgetName, BudgetAmount, BudgetDescription):
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
 		#insert the new budget into the appropriate table
-		cur.execute('''INSERT INTO Budget (Budget_Name,Budget_Note)VALUES(?,?)''',(BudgetName,BudgetDescription))
+		cur.execute('''INSERT INTO Budget (Budget_Name,Budget_Amount, Budget_Note)VALUES(?,?,?)''',(BudgetName, BudgetAmount, BudgetDescription))
 		#commit the data, and close the database
 		conn.commit()
 		conn.close()
@@ -480,6 +480,7 @@ with lite.connect(DIR_PATH) as conn:
 		#close the database and return rows
 		conn.close()
 	
+
 	def TupleToString(strng):
 		strng=str(strng)
 		strng=strng.rstrip(")")

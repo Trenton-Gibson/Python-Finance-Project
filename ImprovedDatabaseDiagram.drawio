@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2026-07-18T17:51:39.317Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.8 Chrome/114.0.5735.289 Electron/25.5.0 Safari/537.36" etag="yHZe99X34UQBRirs4hWT" version="21.6.8" type="device" pages="2">
+<mxfile host="Electron" modified="2026-07-19T02:49:11.656Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.8 Chrome/114.0.5735.289 Electron/25.5.0 Safari/537.36" etag="OKSXvBtCYF3GQspgwPPu" version="21.6.8" type="device" pages="2">
   <diagram name="Rough Draft" id="NPlMHkNvqWjE_DLG57Bd">
     <mxGraphModel dx="2126" dy="606" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -110,12 +110,12 @@
     </mxGraphModel>
   </diagram>
   <diagram id="fsDzWz9wnIdrl9sz_pAY" name="Final Draft">
-    <mxGraphModel dx="2126" dy="606" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1583" dy="647" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="TvVd9Cl2NEj4dHeDIUuE-1" value="Budget" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="-820" y="410" width="260" height="120" as="geometry" />
+          <mxGeometry x="-820" y="370" width="260" height="150" as="geometry" />
         </mxCell>
         <mxCell id="TvVd9Cl2NEj4dHeDIUuE-2" value="BudgetID (PK, NN, AI, U) (Integer)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="TvVd9Cl2NEj4dHeDIUuE-1" vertex="1">
           <mxGeometry y="30" width="260" height="30" as="geometry" />
@@ -125,6 +125,9 @@
         </mxCell>
         <mxCell id="J9fFxr4Jw-J15hlL2jtE-2" value="Budget_Note (NN) (Text)" style="text;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="TvVd9Cl2NEj4dHeDIUuE-1" vertex="1">
           <mxGeometry y="90" width="260" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="krnGIdr8gPhmHOkKH5DU-1" value="Budget_Note (NN) (Text)" style="text;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="TvVd9Cl2NEj4dHeDIUuE-1">
+          <mxGeometry y="120" width="260" height="30" as="geometry" />
         </mxCell>
         <mxCell id="TvVd9Cl2NEj4dHeDIUuE-4" value="Budget_Item" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="-460" y="430" width="220" height="180" as="geometry" />
