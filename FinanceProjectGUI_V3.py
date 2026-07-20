@@ -754,7 +754,10 @@ class FinanceGUI:
 
 	def RepopulateBudgetDropbox(self):
 		BudgetNames=FinanceProjectDatabaseAccess.GetBudgets()
-		self.BudgetEditingDropdown['values'] = BudgetNames 
+		NamesList=[]
+		for name in BudgetNames:
+			NamesList.append(name[0])
+		self.BudgetEditingDropdown['values'] = NamesList
 
 
 	def ResetBudgetTree(self,event):
@@ -766,6 +769,7 @@ class FinanceGUI:
 			self.BudgetInfoTreeview.delete(item)
 		for row in BudgetItems:
 			self.BudgetInfoTreeview.insert("", tk.END, values=row)
+		self.ResetBudgetStats()
 
 
 	def AddBudgetItem(self):
@@ -776,10 +780,36 @@ class FinanceGUI:
 		BudgetItemNote=self.BudgetItemNoteField.get()
 		FinanceProjectDatabaseAccess.AddBudgetItem(BudgetName, LogicalAccountName, BudgetAllocationType, BudgetAllocationAmount, BudgetItemNote)
 		self.ResetBudgetTree("event")
-		BudgetName=self.BudgetEditingDropdown.delete(0, END)
-		LogicalAccountName=self.EditBudgetLogicalDropdown.delete(0, END)
-		BudgetAllocationType=self.BudgetAllocationTypeDropdown.delete(0, END)
-		BudgetAllocationAmount=self.BudgetAllocationAmountField.delete(0, END)
+		self.EditBudgetLogicalDropdown.delete(0, END)
+		self.BudgetAllocationTypeDropdown.delete(0, END)
+		self.BudgetAllocationAmountField.delete(0, END)
+		self.ResetBudgetStats()
+
+
+	def ResetBudgetStats(self):
+		# Get the current budget in use from the dropdown
+		# for choosing a budget.
+		BudgetName=self.BudgetEditingDropdown.get()
+		# Get a list from the database module that contains all the
+		# data for a row in the Budget table.
+		BudgetStats=FinanceProjectDatabaseAccess.GetBudgetInfo(BudgetName)
+		BudgetAmount=BudgetStats[0]
+		BudgetAmount=float(BudgetAmount[3])
+		BudgetItems=FinanceProjectDatabaseAccess.GetBudgetItems(BudgetName)
+		AllocatedFunds=float()
+		FundsInRemainder=float()
+		for row in BudgetItems:
+			AllocationType=row[2]
+			if AllocationType==BudgetAllocationTypes.PERCENTAGE:
+				AllocatedFunds+=(float(row[3])/100*BudgetAmount)
+			elif AllocationType==BudgetAllocationTypes.REMAINDER:
+				AllocatedFunds+=float(row[3])
+				FundsInRemainder+=float(row[3])
+			elif AllocationType==BudgetAllocationTypes.FIXED:
+				AllocatedFunds+=float(row[3])
+		self.BudgetStatsLabel['text']=f"Total Budget Allocation:${BudgetAmount}      Unallocated Funds:${BudgetAmount-AllocatedFunds}           Percentage of Funds Unallocated:{((BudgetAmount-AllocatedFunds)/BudgetAmount)*100}%        Funds Allocated to the Remainder:${FundsInRemainder}"
+		
+
 
 # Call the Finance GUI Class
 if __name__ == '__main__':

@@ -35,9 +35,9 @@ with lite.connect(DIR_PATH) as conn:
 			if AccountIDs=='':
 				return
 			#loop acquires all data for accounts with transactionIDs
-			for item in AccountIDs:
+			for row in AccountIDs:
 				#gets a list of all the transactionIDs in integer form
-				TransIDList = TransIDProcessing(AccountType, item)
+				TransIDList = TransIDProcessing(AccountType, row)
 				#if an account doesn't have transactions recorded for it TransIDList will equal 'e'
 				# and thus won't get access to the core code
 				if 'e' not in TransIDList:
@@ -79,8 +79,8 @@ with lite.connect(DIR_PATH) as conn:
 		# make an empty list to put all the transformed account Ids in
 		AccIDList = []
 		#turns each tuple value and into an integer and puts it in the AccIDList
-		for item in rows:
-			AccIDString = str(item)
+		for row in rows:
+			AccIDString = str(row)
 			AccIDString = AccIDString.lstrip('(')
 			AccIDString = AccIDString.rstrip(')')
 			AccIDString = AccIDString.rstrip(',')
@@ -108,8 +108,8 @@ with lite.connect(DIR_PATH) as conn:
 		#if there isn't anything in the list it can't access the core code
 		if len(TransID)>0:
 			#turns each TransactionID into integer form and inserts it into list
-			for item in TransID:
-				TransIDString = str(item)
+			for row in TransID:
+				TransIDString = str(row)
 				TransIDString = TransIDString.lstrip('(')
 				TransIDString = TransIDString.rstrip(')')
 				TransIDString = TransIDString.rstrip(',')
@@ -138,8 +138,8 @@ with lite.connect(DIR_PATH) as conn:
 		, AccountType, AccountType, AccountType, AccountType, AccountType, MaxTransID,))
 		rows = cur.fetchall()
 		#turn the rows into a string
-		for item in rows:
-			String =item
+		for row in rows:
+			String =row
 			break
 		rows=String
 		#close the database and return rows
@@ -160,12 +160,12 @@ with lite.connect(DIR_PATH) as conn:
 		#get the account number
 		UntransformedAccountInfo = str(AccountInfo[0])
 		AccountInfo=''
-		for item in UntransformedAccountInfo:
-			AccountInfo+=item
+		for row in UntransformedAccountInfo:
+			AccountInfo+=row
 		cur.execute('''SELECT RealAccountID FROM Real_Account WHERE Real_Account_Type=?''',(AccountInfo,))
 		AccountNum=cur.fetchall()
-		for item in AccountNum:
-			String = str(item)
+		for row in AccountNum:
+			String = str(row)
 			String = String.lstrip('(')
 			String = String.rstrip(')')
 			String = String.rstrip(',')
@@ -175,8 +175,8 @@ with lite.connect(DIR_PATH) as conn:
 		PreviousBalance =cur.fetchall()
 		
 		#turn previous balance tuple into string
-		for item in PreviousBalance:
-			String = str(item)
+		for row in PreviousBalance:
+			String = str(row)
 			String = String.lstrip('(')
 			String = String.rstrip(')')
 			String = String.rstrip(',')
@@ -194,8 +194,8 @@ with lite.connect(DIR_PATH) as conn:
 		TransID=cur.fetchall()
 		#Convert the maximum transaction into int
 		#and make the next transaction ID
-		for item in TransID:
-			String = str(item)
+		for row in TransID:
+			String = str(row)
 			String = String.lstrip('(')
 			String = String.rstrip(')')
 			String = String.rstrip(',')
@@ -289,8 +289,8 @@ with lite.connect(DIR_PATH) as conn:
 		#obtains the highest transactionID and makes the next one
 		cur.execute('SELECT max(TransactionID) FROM "Transaction"')
 		TransID = cur.fetchall()
-		for item in TransID:
-			String = str(item)
+		for row in TransID:
+			String = str(row)
 			String = String.lstrip('(')
 			String = String.rstrip(')')
 			String = String.rstrip(',')
@@ -301,8 +301,8 @@ with lite.connect(DIR_PATH) as conn:
 		#get the account Id of the recipient account and transform it into integer data
 		cur.execute('''SELECT RealAccountID FROM Real_Account WHERE Real_Account_Type=?''',(RecipientAccount,))
 		AccountNum=cur.fetchall()
-		for item in AccountNum:
-			String = str(item)
+		for row in AccountNum:
+			String = str(row)
 			String = String.lstrip('(')
 			String = String.rstrip(')')
 			String = String.rstrip(',')
@@ -311,8 +311,8 @@ with lite.connect(DIR_PATH) as conn:
 		#get the balance for the recipient account and turn it into float data and round it
 		cur.execute('SELECT Balance FROM Real_Account WHERE RealAccountID = ?', (AccountNum,))
 		PreviousBalance = cur.fetchall()
-		for item in PreviousBalance:
-			String = str(item)
+		for row in PreviousBalance:
+			String = str(row)
 			String = String.lstrip('(')
 			String = String.rstrip(')')
 			String = String.rstrip(',')
@@ -330,8 +330,8 @@ with lite.connect(DIR_PATH) as conn:
 		# obtains the highest transactionID and makes the next one
 		cur.execute('SELECT max(TransactionID) FROM "Transaction"')
 		TransID = cur.fetchall()
-		for item in TransID:
-			String = str(item)
+		for row in TransID:
+			String = str(row)
 			String = String.lstrip('(')
 			String = String.rstrip(')')
 			String = String.rstrip(',')
@@ -339,8 +339,8 @@ with lite.connect(DIR_PATH) as conn:
 		# get the account Id of the giving account and transform it into integer data
 		cur.execute('''SELECT RealAccountID FROM Real_Account WHERE Real_Account_Type=?''', (GivingAccount,))
 		AccountNum = cur.fetchall()
-		for item in AccountNum:
-			String = str(item)
+		for row in AccountNum:
+			String = str(row)
 			String = String.lstrip('(')
 			String = String.rstrip(')')
 			String = String.rstrip(',')
@@ -348,8 +348,8 @@ with lite.connect(DIR_PATH) as conn:
 		# get the balance for the giving account and turn it into float data and round it
 		cur.execute('SELECT Balance FROM Real_Account WHERE RealAccountID = ?', (AccountNum,))
 		PreviousBalance = cur.fetchall()
-		for item in PreviousBalance:
-			String = str(item)
+		for row in PreviousBalance:
+			String = str(row)
 			String = String.lstrip('(')
 			String = String.rstrip(')')
 			String = String.rstrip(',')
@@ -422,10 +422,11 @@ with lite.connect(DIR_PATH) as conn:
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
-		#Get the budget items for specified budget
+		#Get the budget rows for specified budget
 		cur.execute('''SELECT Budget_Name FROM Budget''')
 		# Fetch the rows from the SELECT query
 		rows = cur.fetchall()
+		rows = TupleToString(rows)
 		#close the database and return rows
 		conn.close()
 		return rows	
@@ -435,19 +436,20 @@ with lite.connect(DIR_PATH) as conn:
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
-		#Get the budget items for specified budget
+		#Get the budget rows for specified budget
 		cur.execute('''SELECT Budget.Budget_Name, Logical_Account.Logical_Account_Type, Budget_Allocation.Budget_Allocation_Type, Budget_Allocation.Budget_Allocation_Amount,
 		Budget_Item.Budget_Item_Note FROM Budget_Item INNER JOIN Logical_Account ON Budget_Item.LogicalAccountID = Logical_Account.LogicalAccountID
 		INNER JOIN Budget_Allocation ON Budget_Item.BudgetAllocationID = Budget_Allocation.BudgetAllocationID
 		INNER JOIN Budget ON Budget_Item.BudgetID = Budget.BudgetID  WHERE Budget.Budget_Name=?''', (BudgetName,))
 		# Fetch the rows from the SELECT query
 		rows = cur.fetchall()
+		rows=TupleToString(rows)
 		#close the database and return rows
 		conn.close()
 		return rows	
 	
 
-	def AddBudgetItem(BudgetName, LogicalAccountName, BudgetAllocationType, BudgetAllocationAmount, BudgetItemNote):
+	def AddBudgetItem(BudgetName, LogicalAccountName, BudgetAllocationType, BudgetAllocationAmount, BudgetrowNote):
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
@@ -460,6 +462,8 @@ with lite.connect(DIR_PATH) as conn:
 		BudgetAllocationID=cur.fetchall()
 		BudgetAllocationID=BudgetAllocationID[0]
 		BudgetAllocationID=TupleToString(BudgetAllocationID)
+		BudgetAllocationID=BudgetAllocationID[0]
+		BudgetAllocationID=int(BudgetAllocationID[0])
 		#Get the ID for the desired budget based off the budget name
 		cur.execute('''SELECT BudgetID from Budget WHERE Budget_Name=?''', (BudgetName,))
 		# this will retrieve the desired BudgetID whilst not returning any data from
@@ -468,14 +472,18 @@ with lite.connect(DIR_PATH) as conn:
 		BudgetID=cur.fetchall()
 		BudgetID=BudgetID[0]
 		BudgetID=TupleToString(BudgetID)
+		BudgetID=BudgetID[0]
+		BudgetID=int(BudgetID[0])
 		#Get the ID for the desired budget based off the budget name
 		cur.execute('''SELECT LogicalAccountID FROM Logical_Account WHERE Logical_Account_Type=?''', (LogicalAccountName,))
 		LogicalAccountID=cur.fetchall()
 		LogicalAccountID=LogicalAccountID[0]
 		LogicalAccountID=TupleToString(LogicalAccountID)
-		# Insert the new budget item into the Budget_Item table
+		LogicalAccountID=LogicalAccountID[0]
+		LogicalAccountID=int(LogicalAccountID[0])
+		# Insert the new budget row into the Budget_Item table
 		cur.execute('''INSERT INTO Budget_Item (BudgetID, LogicalAccountID, BudgetAllocationID,Budget_Item_Note)VALUES(?,?,?,?)''', 
-			(BudgetID,LogicalAccountID,BudgetAllocationID,BudgetItemNote))
+			(BudgetID,LogicalAccountID,BudgetAllocationID,BudgetrowNote))
 		conn.commit()
 		#close the database and return rows
 		conn.close()
@@ -483,7 +491,38 @@ with lite.connect(DIR_PATH) as conn:
 
 	def TupleToString(strng):
 		strng=str(strng)
-		strng=strng.rstrip(")")
-		strng=strng.lstrip("(")
-		strng=strng.rstrip(",")
-		return strng
+		strng=strng.rstrip("]")
+		strng=strng.lstrip("[")
+		StrngList1=strng.split("(")
+		StrngList2=[]
+		for row in StrngList1:
+			row=row.replace("'", "")
+			row=row.replace(")", "")
+			row=row.rstrip(" ")
+			row=row.rstrip(",")
+			row=row.split(",")
+			count=0
+			for item in row:
+				row[count]=item.lstrip(" ")
+				if row[count]=='':
+					row.pop(count)
+
+				count+=1
+			StrngList2.append(row)
+		StrngList2.pop(0)
+		return StrngList2
+	
+
+	def GetBudgetInfo(BudgetName):
+		# connect to the database and make a cursor
+		conn = lite.connect(DIR_PATH)
+		cur = conn.cursor()
+		cur.execute('''SELECT * FROM Budget WHERE Budget_Name=?''', (BudgetName,))
+		# Fetch the rows from the SELECT query
+		row = cur.fetchall()
+		# Turn the budget info into a string and have each
+		# data point be a separate string in a list
+		row=TupleToString(row)
+		#close the database and return rows
+		conn.close()
+		return row	
