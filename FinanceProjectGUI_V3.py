@@ -130,10 +130,9 @@ class FinanceGUI:
 		self.Budget_yscroll.config(command=self.BudgetInfoTreeview.yview)
 		self.BudgetStatsLabel=tk.Label(self.EditBudgetFrame,
 			text="Total Budget Allocation:      Unallocated Funds:           Percentage of Funds Unallocated:        Funds Allocated to the Remainder:")
-		self.SaveandExitButton=tk.Button(self.EditBudgetFrame, text="Save and Exit")
 		self.DeleteItemButtonTutorial=tk.Label(self.EditBudgetFrame,
 			text="If you wish to delete a budget item, click on said budget item in the viewing table and press the Delete Budget Item button to remove the unvwanted budget item.")
-		self.DeleteItemButton=tk.Button(self.EditBudgetFrame, text="Delete Budget Item")
+		self.DeleteItemButton=tk.Button(self.EditBudgetFrame, text="Delete Budget Item", command=self.DeleteBudgetItem)
 		## Add widgets to Edit Budget Frame
 		self.BudgetEditingAndViewingLabel.grid(row=0,column=0,columnspan=3)
 		self.BudgetEditingDropdownLabel.grid(row=0,column=3)
@@ -151,7 +150,6 @@ class FinanceGUI:
 		self.BudgetInfoTreeview.grid(row=3,column=4)
 		self.Budget_yscroll.grid(row=3,column=5,sticky='wns')
 		self.BudgetStatsLabel.grid(row=4,column=1,columnspan=7)
-		self.SaveandExitButton.grid(row=5,column=1)
 		self.DeleteItemButtonTutorial.grid(row=5,column=2,columnspan=5)
 		self.DeleteItemButton.grid(row=5,column=7)
 										 
@@ -783,6 +781,7 @@ class FinanceGUI:
 		self.EditBudgetLogicalDropdown.delete(0, END)
 		self.BudgetAllocationTypeDropdown.delete(0, END)
 		self.BudgetAllocationAmountField.delete(0, END)
+		self.BudgetItemNoteField.delete(0, END)
 		self.ResetBudgetStats()
 
 
@@ -798,19 +797,38 @@ class FinanceGUI:
 		BudgetItems=FinanceProjectDatabaseAccess.GetBudgetItems(BudgetName)
 		AllocatedFunds=float()
 		FundsInRemainder=float()
+		RemainderItems=[]
 		for row in BudgetItems:
 			AllocationType=row[2]
 			if AllocationType==BudgetAllocationTypes.PERCENTAGE:
 				AllocatedFunds+=(float(row[3])/100*BudgetAmount)
 			elif AllocationType==BudgetAllocationTypes.REMAINDER:
-				AllocatedFunds+=float(row[3])
-				FundsInRemainder+=float(row[3])
+				RemainderItems.append(row)
 			elif AllocationType==BudgetAllocationTypes.FIXED:
 				AllocatedFunds+=float(row[3])
-		self.BudgetStatsLabel['text']=f"Total Budget Allocation:${BudgetAmount}      Unallocated Funds:${BudgetAmount-AllocatedFunds}           Percentage of Funds Unallocated:{((BudgetAmount-AllocatedFunds)/BudgetAmount)*100}%        Funds Allocated to the Remainder:${FundsInRemainder}"
-		
+		if RemainderItems:
+			FundsInRemainder+=BudgetAmount-AllocatedFunds
+		if BudgetAmount > 0:
+			self.BudgetStatsLabel['text']=f"Total Budget Allocation:${BudgetAmount}      Unallocated Funds:${BudgetAmount-AllocatedFunds-FundsInRemainder}           Percentage of Funds Unallocated:{((BudgetAmount-AllocatedFunds-FundsInRemainder)/BudgetAmount)*100}%        Funds Allocated to the Remainder:${FundsInRemainder}/{len(RemainderItems)}"
+		else:
+			messagebox.showerror("Divison by Zero!", "Can't show the stats of a budget with no allocated funds!")
 
 
+	def DeleteBudgetItem(self):
+		FocusedRow=self.BudgetInfoTreeview.focus()
+		print(FocusedRow)
+		# Subtracting 1 is so it can be used in indexing lists
+		SelectedRowNumber = int(FocusedRow.lstrip("I"))
+		SelectedRowNumber-=1
+		FocusedRow=self.BudgetInfoTreeview.item(FocusedRow, 'values')
+		BudgetName=str()
+		for item in FocusedRow:
+			BudgetName=str(item)
+			break
+		print(SelectedRowNumber)
+		FinanceProjectDatabaseAccess.DeleteBudgetItem(BudgetName,SelectedRowNumber)
+		self.ResetBudgetTree("event")
+		self.ResetBudgetStats()
 # Call the Finance GUI Class
 if __name__ == '__main__':
 	FinanceGUI()

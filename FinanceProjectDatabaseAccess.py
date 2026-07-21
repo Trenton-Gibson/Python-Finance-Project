@@ -5,6 +5,7 @@
 # import sqlite resources
 import sqlite3 as lite
 import os.path
+from FinanceProjectGUI_V3 import BudgetAllocationTypes
 #Specify the specific filepath of the database so it can be used in the python interpreter
 # and establish a connection with the finances database
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -453,6 +454,8 @@ with lite.connect(DIR_PATH) as conn:
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
+		if BudgetAllocationType == BudgetAllocationTypes.REMAINDER:
+			BudgetAllocationAmount=0
 		# Insert the new budget allocation entry into the Budget_Allocation table
 		cur.execute('''INSERT INTO Budget_Allocation (Budget_Allocation_Type, Budget_Allocation_Amount)VALUES(?,?)'''
 			,(BudgetAllocationType,BudgetAllocationAmount))
@@ -526,3 +529,18 @@ with lite.connect(DIR_PATH) as conn:
 		#close the database and return rows
 		conn.close()
 		return row	
+	
+	def DeleteBudgetItem(BudgetName, SelectedRowNumber):
+		# connect to the database and make a cursor
+		conn = lite.connect(DIR_PATH)
+		cur = conn.cursor()
+		cur.execute('''SELECT BudgetID from Budget WHERE Budget_Name=?''',(BudgetName,))
+		BudgetID=TupleToString(cur.fetchall())
+		BudgetID=int(BudgetID[0][0])
+		cur.execute('''SELECT BudgetItemID from Budget_Item WHERE BudgetID=?''',(BudgetID,))
+		BudgetItemID=TupleToString(cur.fetchall())
+		print(BudgetItemID)
+		BudgetItemID=int(BudgetItemID[SelectedRowNumber][0])
+		cur.execute('''DELETE FROM Budget_Item WHERE BudgetItemID=?''',(BudgetItemID,))
+		conn.commit()
+		conn.close()
