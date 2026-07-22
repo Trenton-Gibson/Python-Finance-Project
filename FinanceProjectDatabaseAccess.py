@@ -438,7 +438,7 @@ with lite.connect(DIR_PATH) as conn:
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
 		#Get the budget rows for specified budget
-		cur.execute('''SELECT Budget.Budget_Name, Logical_Account.Logical_Account_Type, Budget_Allocation.Budget_Allocation_Type, Budget_Allocation.Budget_Allocation_Amount,
+		cur.execute('''SELECT Budget.Budget_Name, Budget_Item.BudgetItemID, Logical_Account.Logical_Account_Type, Budget_Allocation.Budget_Allocation_Type, Budget_Allocation.Budget_Allocation_Amount,
 		Budget_Item.Budget_Item_Note FROM Budget_Item INNER JOIN Logical_Account ON Budget_Item.LogicalAccountID = Logical_Account.LogicalAccountID
 		INNER JOIN Budget_Allocation ON Budget_Item.BudgetAllocationID = Budget_Allocation.BudgetAllocationID
 		INNER JOIN Budget ON Budget_Item.BudgetID = Budget.BudgetID  WHERE Budget.Budget_Name=?''', (BudgetName,))
@@ -530,17 +530,11 @@ with lite.connect(DIR_PATH) as conn:
 		conn.close()
 		return row	
 	
-	def DeleteBudgetItem(BudgetName, SelectedRowNumber):
+
+	def DeleteBudgetItem(BudgetItemID):
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
-		cur.execute('''SELECT BudgetID from Budget WHERE Budget_Name=?''',(BudgetName,))
-		BudgetID=TupleToString(cur.fetchall())
-		BudgetID=int(BudgetID[0][0])
-		cur.execute('''SELECT BudgetItemID from Budget_Item WHERE BudgetID=?''',(BudgetID,))
-		BudgetItemID=TupleToString(cur.fetchall())
-		print(BudgetItemID)
-		BudgetItemID=int(BudgetItemID[SelectedRowNumber][0])
 		cur.execute('''DELETE FROM Budget_Item WHERE BudgetItemID=?''',(BudgetItemID,))
 		conn.commit()
 		conn.close()

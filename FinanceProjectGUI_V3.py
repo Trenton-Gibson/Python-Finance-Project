@@ -115,18 +115,20 @@ class FinanceGUI:
 												 columns=('column1', 'column2', 'column3', 'column4'),
 												 show='tree headings', yscrollcommand=self.Budget_yscroll.set)
 		##Define and create the columns for the Account Treeview
-		self.BudgetInfoTreeview['columns'] = ('Budget Name', 'Logical Account', 'Budget Allocation Type', 'Budget Allocation Amount','Budget Item Note')
+		self.BudgetInfoTreeview['columns'] = ('Budget Name', 'Budget Item ID','Logical Account', 'Budget Allocation Type', 'Budget Allocation Amount','Budget Item Note')
 		self.BudgetInfoTreeview.column("#0",width=20)
 		self.BudgetInfoTreeview.column('Budget Name', width=80)
 		self.BudgetInfoTreeview.heading("#1", text="Budget Name")
+		self.BudgetInfoTreeview.column('Budget Item ID', width=20)
+		self.BudgetInfoTreeview.heading("#2", text="Budget Item ID")
 		self.BudgetInfoTreeview.column('Logical Account', width=80)
-		self.BudgetInfoTreeview.heading("#2", text="Logical Account")
+		self.BudgetInfoTreeview.heading("#3", text="Logical Account")
 		self.BudgetInfoTreeview.column('Budget Allocation Type', width=80)
-		self.BudgetInfoTreeview.heading("#3", text="Budget Allocation Type")
+		self.BudgetInfoTreeview.heading("#4", text="Budget Allocation Type")
 		self.BudgetInfoTreeview.column('Budget Allocation Amount', width=80)
-		self.BudgetInfoTreeview.heading("#4", text="Budget Allocation Amount")
+		self.BudgetInfoTreeview.heading("#5", text="Budget Allocation Amount")
 		self.BudgetInfoTreeview.column('Budget Item Note', width=80)
-		self.BudgetInfoTreeview.heading("#5", text="Budget Item Note")
+		self.BudgetInfoTreeview.heading("#6", text="Budget Item Note")
 		self.Budget_yscroll.config(command=self.BudgetInfoTreeview.yview)
 		self.BudgetStatsLabel=tk.Label(self.EditBudgetFrame,
 			text="Total Budget Allocation:      Unallocated Funds:           Percentage of Funds Unallocated:        Funds Allocated to the Remainder:")
@@ -799,13 +801,14 @@ class FinanceGUI:
 		FundsInRemainder=float()
 		RemainderItems=[]
 		for row in BudgetItems:
-			AllocationType=row[2]
+			print(row)
+			AllocationType=row[3]
 			if AllocationType==BudgetAllocationTypes.PERCENTAGE:
-				AllocatedFunds+=(float(row[3])/100*BudgetAmount)
+				AllocatedFunds+=(float(row[4])/100*BudgetAmount)
 			elif AllocationType==BudgetAllocationTypes.REMAINDER:
 				RemainderItems.append(row)
 			elif AllocationType==BudgetAllocationTypes.FIXED:
-				AllocatedFunds+=float(row[3])
+				AllocatedFunds+=float(row[4])
 		if RemainderItems:
 			FundsInRemainder+=BudgetAmount-AllocatedFunds
 		if BudgetAmount > 0:
@@ -816,17 +819,16 @@ class FinanceGUI:
 
 	def DeleteBudgetItem(self):
 		FocusedRow=self.BudgetInfoTreeview.focus()
-		print(FocusedRow)
-		# Subtracting 1 is so it can be used in indexing lists
-		SelectedRowNumber = int(FocusedRow.lstrip("I"))
-		SelectedRowNumber-=1
 		FocusedRow=self.BudgetInfoTreeview.item(FocusedRow, 'values')
-		BudgetName=str()
+		BudgetItemID=str()
+		count=0
 		for item in FocusedRow:
-			BudgetName=str(item)
-			break
-		print(SelectedRowNumber)
-		FinanceProjectDatabaseAccess.DeleteBudgetItem(BudgetName,SelectedRowNumber)
+			BudgetItemID=str(item)
+			if count==1:
+				break
+			count+=1
+		BudgetItemID=int(BudgetItemID)
+		FinanceProjectDatabaseAccess.DeleteBudgetItem(BudgetItemID)
 		self.ResetBudgetTree("event")
 		self.ResetBudgetStats()
 # Call the Finance GUI Class

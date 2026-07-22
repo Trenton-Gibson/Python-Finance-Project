@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2026-07-21T02:55:39.996Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.8 Chrome/114.0.5735.289 Electron/25.5.0 Safari/537.36" etag="gqpxayrirRok-hk2Blpb" version="21.6.8" type="device" pages="3">
+<mxfile host="Electron" modified="2026-07-22T01:52:21.067Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.8 Chrome/114.0.5735.289 Electron/25.5.0 Safari/537.36" etag="G8-H7dC51oy6YsGW0GN3" version="21.6.8" type="device" pages="3">
   <diagram id="e9vRKVET7do9AkayF3Nr" name="Improved Main Page UI Rought Draft">
     <mxGraphModel dx="1583" dy="1747" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -554,7 +554,7 @@
     </mxGraphModel>
   </diagram>
   <diagram name="Budgeting UI Rought Draft" id="X-FMak-2P0UCofctdyTl">
-    <mxGraphModel dx="1047" dy="924" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1047" dy="914" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -640,16 +640,16 @@
           <mxGeometry y="660" width="850" height="140" as="geometry" />
         </mxCell>
         <mxCell id="XdC7Ak8XQNGJ8gn5UBsQ-1" value="Logical&lt;br&gt;Account" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="130" y="460" width="90" height="60" as="geometry" />
+          <mxGeometry x="340" y="460" width="90" height="60" as="geometry" />
         </mxCell>
         <mxCell id="XdC7Ak8XQNGJ8gn5UBsQ-2" value="Budget Allocation&lt;br&gt;Type" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="220" y="460" width="170" height="60" as="geometry" />
+          <mxGeometry x="430" y="460" width="170" height="60" as="geometry" />
         </mxCell>
         <mxCell id="XdC7Ak8XQNGJ8gn5UBsQ-3" value="Budget Allocation&lt;br&gt;Amount" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="390" y="460" width="120" height="60" as="geometry" />
+          <mxGeometry x="600" y="460" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="XdC7Ak8XQNGJ8gn5UBsQ-4" value="Budget Item&lt;br&gt;Note" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="510" y="460" width="335" height="60" as="geometry" />
+          <mxGeometry x="720" y="460" width="125" height="60" as="geometry" />
         </mxCell>
         <mxCell id="zM1icCKLoCZLi0Cra-b2-1" value="Budget Name" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry y="460" width="130" height="60" as="geometry" />
@@ -659,6 +659,9 @@
         </mxCell>
         <mxCell id="NtRtvX6dOvF2fzBcy7sY-3" value="Budget Amount" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="320" y="20" width="120" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="WUabxu5FPyBzUriIvV3r-1" value="Budget Name" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="130" y="460" width="210" height="60" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
