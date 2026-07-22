@@ -18,6 +18,10 @@ class BudgetAllocationTypes(StrEnum):
 	FIXED="Fixed"
 	REMAINDER="Remainder"
 
+class BudgetExpenditureTypes(StrEnum):
+	INCOME="Income"
+	Expense="Expense"
+
 # Create Finance GUI class
 class FinanceGUI:
 	def __init__(self):
@@ -222,7 +226,7 @@ class FinanceGUI:
 		self.LogicalAccountLabel=tk.Label(self.HandleAccountFrame, text='Logical Account')
 		self.LogicalAccountDropdown=ttk.Combobox(self.HandleAccountFrame)
 		self.IncomeOrExpenseLabel=tk.Label(self.HandleAccountFrame, text='Income or Expense')
-		self.IncomeOrExpenseDropdown=ttk.Combobox(self.HandleAccountFrame)
+		self.IncomeOrExpenseDropdown=ttk.Combobox(self.HandleAccountFrame,values=['Income','Expensive'])
 		self.BudgetLabel=tk.Label(self.HandleAccountFrame, text='Budget (If Income)')
 		self.BudgetDropdown=ttk.Combobox(self.HandleAccountFrame)
 		self.TransactionAmountLabel=tk.Label(self.HandleAccountFrame, text='Transaction Amount')
@@ -235,7 +239,7 @@ class FinanceGUI:
 		self.YearofTransEntry = tk.Entry(self.HandleAccountFrame,)
 		self.TransactionTypeLabel = tk.Label(self.HandleAccountFrame, text='Transaction Description')
 		self.TransactionTypeEntry = tk.Entry(self.HandleAccountFrame,)
-		self.EnterTransactionButton = tk.Button(self.HandleAccountFrame, text='Enter Transaction')
+		self.EnterTransactionButton = tk.Button(self.HandleAccountFrame, text='Enter Transaction', command=self.TransDataAndTransCommit)
 		## Pack Handle Account Frame Widgets
 		self.TransactionLabel.grid(row=0, column=0, columnspan=6)
 		self.RealAccountLabel.grid(row=1, column=0)
@@ -384,6 +388,28 @@ class FinanceGUI:
 	# Additional Methods
 	#Handles Typical transactions.Is called by Handle Account Frame Widgets.
 	def TransDataAndTransCommit(self):
+		try:
+			# Get data for Transaction
+			RealAccount=self.RealAccountDropdown.get()
+			LogicalAccount=self.LogicalAccountDropdown.get()
+			ExpenditureType=self.IncomeOrExpenseDropdown.get()
+			ChosenBudget=self.BudgetDropdown.get()
+			TransactionAmount=self.TransactionAmountField.get()
+			Month=self.MonthofTransEntry.get()
+			Day=self.DayofTransEntry.get()
+			Year=self.YearofTransEntry.get()
+			TransactionDate=Month+'-'+Day+'-'+Year
+			TransactionDescription=self.TransactionTypeEntry.get()
+			#Calls the Handle Account Function from the other module to interact with the database
+			FinanceProjectDatabaseAccess.HandleAccount(RealAccount, LogicalAccount,ExpenditureType,ChosenBudget, TransactionAmount, TransactionDate,TransactionDescription)
+			# Repopulate treeviews with data after the changes are made to represent them
+			self.RepopulateAccountsTreeview()
+			self.RepopulateTransactionsTreeview()
+			self.TransactionEntry.delete(0, END)
+			self.TransactionTypeEntry.delete(0, END)
+			self.YearofTransEntry.delete(0,END)
+			self.DayofTransEntry.delete(0,END)
+			self.MonthofTransEntry.delete(0,END)
 		try:
 			# Get data for Transaction
 			self.selected = self.AccountsInfoTreeview.focus()
@@ -683,7 +709,7 @@ class FinanceGUI:
 		self.TopMidFrame.grid_remove()
 		self.TrueMiddleFrame.grid_remove()
 		self.BudgetingFrame.grid(row=0,column=1)
-		self.RepopulateBudgetDropbox()
+		self.RepopulateBudgetDropboxes()
 		RealAccountsList, LogicalAccountsList = FinanceProjectDatabaseAccess.AccountOverviewData()
 		LogicalAccountNames=[]
 		for row in LogicalAccountsList:
@@ -707,6 +733,7 @@ class FinanceGUI:
 		self.TopMidFrame.grid(row=1, column=1)
 		self.TrueMiddleFrame.grid(row=2, column=1)
 		self.RepopulateAccountDropboxes()
+		self.RepopulateBudgetDropboxes()
 
 
 	def RepopulateAccountDropboxes(self):
@@ -752,12 +779,13 @@ class FinanceGUI:
 		self.RepopulateBudgetDropbox()
 
 
-	def RepopulateBudgetDropbox(self):
+	def RepopulateBudgetDropboxes(self):
 		BudgetNames=FinanceProjectDatabaseAccess.GetBudgets()
 		NamesList=[]
 		for name in BudgetNames:
 			NamesList.append(name[0])
 		self.BudgetEditingDropdown['values'] = NamesList
+		self.BudgetDropdown['values'] = NamesList
 
 
 	def ResetBudgetTree(self,event):
@@ -831,6 +859,8 @@ class FinanceGUI:
 		FinanceProjectDatabaseAccess.DeleteBudgetItem(BudgetItemID)
 		self.ResetBudgetTree("event")
 		self.ResetBudgetStats()
+
+
 # Call the Finance GUI Class
 if __name__ == '__main__':
 	FinanceGUI()

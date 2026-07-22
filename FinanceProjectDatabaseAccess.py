@@ -6,6 +6,7 @@
 import sqlite3 as lite
 import os.path
 from FinanceProjectGUI_V3 import BudgetAllocationTypes
+from FinanceProjectGUI_V3 import BudgetExpenditureTypes
 #Specify the specific filepath of the database so it can be used in the python interpreter
 # and establish a connection with the finances database
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -149,7 +150,7 @@ with lite.connect(DIR_PATH) as conn:
 	
 
 	#Inserts transaction record for a specific account
-	def HandleAccount(AccountInfo,TransactionDate,TransactionAmount,TransactionType):
+	def HandleAccount(RealAccount,LogicalAccount,ExpenditureType,ChosenBudget,TransactionAmount,TransactionDate,TransactionDescription):
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
@@ -158,6 +159,13 @@ with lite.connect(DIR_PATH) as conn:
 		if len(TransactionAmount)>0:
 			TransactionAmount=float(TransactionAmount)
 			TransactionAmount = round(TransactionAmount, 2)
+			TransactionAmount = abs(TransactionAmount)
+			if ExpenditureType == BudgetExpenditureTypes.INCOME:
+				pass
+			elif ExpenditureType == BudgetExpenditureTypes.EXPENSE:
+				TransactionAmount*=-1
+			else:
+				return
 		#get the account number
 		UntransformedAccountInfo = str(AccountInfo[0])
 		AccountInfo=''
