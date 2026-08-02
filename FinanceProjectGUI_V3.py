@@ -20,7 +20,7 @@ class BudgetAllocationTypes(StrEnum):
 
 class BudgetExpenditureTypes(StrEnum):
 	INCOME="Income"
-	Expense="Expense"
+	EXPENSE="Expense"
 
 class AccountTypes(StrEnum):
 	REAL="Real"
@@ -162,7 +162,7 @@ class FinanceGUI:
 		self.BudgetStatsLabel.grid(row=4,column=1,columnspan=7)
 		self.DeleteItemButtonTutorial.grid(row=5,column=2,columnspan=5)
 		self.DeleteItemButton.grid(row=5,column=7)
-										 
+										
 		#Create widgets for Sidebar Frame
 		self.AccountManagementButton=tk.Button(self.SidebarFrame, text='Account\nManagement', command=self.ShowAccountManagementWidgets)
 		self.BudgetingButton=tk.Button(self.SidebarFrame, text='Budgeting', command=self.ShowBudgetingWidgets)
@@ -225,9 +225,9 @@ class FinanceGUI:
 		#Create Top Middle Frame Widgets
 		## Create handle account frame widgets
 		self.TransactionLabel = tk.Label(self.HandleAccountFrame, text='Transaction Entry')
-		self.RealAccountLabel = tk.Label(self.HandleAccountFrame,text='Real Account')
+		self.RealAccountLabel = tk.Label(self.HandleAccountFrame,text='Real Account (If Expense)')
 		self.RealAccountDropdown=ttk.Combobox(self.HandleAccountFrame)
-		self.LogicalAccountLabel=tk.Label(self.HandleAccountFrame, text='Logical Account')
+		self.LogicalAccountLabel=tk.Label(self.HandleAccountFrame, text='Logical Account (If Expense)')
 		self.LogicalAccountDropdown=ttk.Combobox(self.HandleAccountFrame)
 		self.IncomeOrExpenseLabel=tk.Label(self.HandleAccountFrame, text='Income or Expense')
 		self.IncomeOrExpenseDropdown=ttk.Combobox(self.HandleAccountFrame,values=['Income','Expense'])
@@ -374,9 +374,7 @@ class FinanceGUI:
 		self.Transaction_yscroll.config(command=self.TransHisTransactionInfo.yview)
 		##Populate the Transaction Treeview with data
 		self.StartAccountHistory = ''
-		rows = FinanceProjectDatabaseAccess.AccountTransactionHistory(self.StartAccountHistory)
-		for row in rows:
-			self.TransHisTransactionInfo.insert("", tk.END, values=row)
+		self.RepopulateTransactionsTreeview()
 		# Change the style of the Treeviews
 		style = ttk.Style()
 		style.configure("Treeview.Heading", fieldbackground='#9613bb', )
@@ -405,7 +403,7 @@ class FinanceGUI:
 			TransactionDate=Month+'-'+Day+'-'+Year
 			TransactionDescription=self.TransactionTypeEntry.get()
 			#If any of the entries are unpopulated or aren't within the proper date range, it sends an error message and the core code isn't executed
-			if RealAccount=='' or LogicalAccount=='' or ExpenditureType=='' or ChosenBudget=='' or TransactionAmount =='' or TransactionDescription == '' \
+			if ExpenditureType=='' or TransactionAmount =='' or TransactionDescription == '' \
 			or Month=='' or Year==''or Day=='' or int(Month) > 12 or int(Month)<1 or int(Day)<0 or int(Day)>31 or int(Year) < 2026  :
 				# Create an error message variable
 				self.ErrorMessage = 'Error! Follow the directions and please try again.'
@@ -432,7 +430,6 @@ class FinanceGUI:
 			self.ErrorMessage ='Error! Follow the directions and please try again.'
 			#Display the error message in an info dialog box.
 			tk.messagebox.showinfo('Error!', self.ErrorMessage)
-			
 			
 	#Creates a new account
 	def AddAccount(self):
@@ -637,15 +634,12 @@ class FinanceGUI:
 			self.TransHisTransactionInfo.delete(item)
 		#Insert new transaction treeview data into the transaction treeview
 		for row in TransactionAccountHistory:
-			TransactionType,TransactionDate,TransactionAmount, 
-			RealAccountName, RealPreviousBalance, RealCurrentBalance,
+			TransactionType,TransactionDate,TransactionAmount,\
+			RealAccountName, RealPreviousBalance, RealCurrentBalance,\
 			LogicalAccountName, LogicalPreviousBalance, LogicalCurrentBalance=row
-			TransactionRow=self.TransHisTransactionInfo.insert("", tk.END,
-			values=(TransactionType,TransactionDate,TransactionAmount,"","","",""))
-			self.TransHisTransactionInfo.insert(TransactionRow, tk.END,
-			values=("","","","Real",RealAccountName,RealPreviousBalance,RealCurrentBalance))
-			self.TransHisTransactionInfo.insert(TransactionRow, tk.END,
-			values=("","","","Logical",LogicalAccountName,LogicalPreviousBalance,LogicalCurrentBalance))
+			TransactionRow=self.TransHisTransactionInfo.insert("", tk.END, values=(TransactionType,TransactionDate,TransactionAmount,"","","",""))
+			self.TransHisTransactionInfo.insert(TransactionRow, tk.END, values=("","","","Real",RealAccountName,RealPreviousBalance,RealCurrentBalance))
+			self.TransHisTransactionInfo.insert(TransactionRow, tk.END, values=("","","","Logical",LogicalAccountName,LogicalPreviousBalance,LogicalCurrentBalance))
 
 
 	def ResetTransHisTree(self):
@@ -785,18 +779,24 @@ class FinanceGUI:
 
 
 	def AddBudgetItem(self):
-		BudgetName=self.BudgetEditingDropdown.get()
-		LogicalAccountName=self.EditBudgetLogicalDropdown.get()
-		BudgetAllocationType=self.BudgetAllocationTypeDropdown.get()
-		BudgetAllocationAmount=self.BudgetAllocationAmountField.get()
-		BudgetItemNote=self.BudgetItemNoteField.get()
-		FinanceProjectDatabaseAccess.AddBudgetItem(BudgetName, LogicalAccountName, BudgetAllocationType, BudgetAllocationAmount, BudgetItemNote)
-		self.ResetBudgetTree("event")
-		self.EditBudgetLogicalDropdown.delete(0, END)
-		self.BudgetAllocationTypeDropdown.delete(0, END)
-		self.BudgetAllocationAmountField.delete(0, END)
-		self.BudgetItemNoteField.delete(0, END)
-		self.ResetBudgetStats()
+		try:
+			BudgetName=self.BudgetEditingDropdown.get()
+			LogicalAccountName=self.EditBudgetLogicalDropdown.get()
+			BudgetAllocationType=self.BudgetAllocationTypeDropdown.get()
+			BudgetAllocationAmount=self.BudgetAllocationAmountField.get()
+			BudgetItemNote=self.BudgetItemNoteField.get()
+			FinanceProjectDatabaseAccess.AddBudgetItem(BudgetName, LogicalAccountName, BudgetAllocationType, BudgetAllocationAmount, BudgetItemNote)
+			self.ResetBudgetTree("event")
+			self.EditBudgetLogicalDropdown.delete(0, END)
+			self.BudgetAllocationTypeDropdown.delete(0, END)
+			self.BudgetAllocationAmountField.delete(0, END)
+			self.BudgetItemNoteField.delete(0, END)
+			self.ResetBudgetStats()
+		except:
+					#Create an error message variable
+					self.ErrorMessage ='Error! Follow the directions and please try again.'
+					#Display the error message in an info dialog box.
+					tk.messagebox.showinfo('Error!', self.ErrorMessage)
 
 
 	def ResetBudgetStats(self):
@@ -813,7 +813,6 @@ class FinanceGUI:
 		FundsInRemainder=float()
 		RemainderItems=[]
 		for row in BudgetItems:
-			print(row)
 			AllocationType=row[3]
 			if AllocationType==BudgetAllocationTypes.PERCENTAGE:
 				AllocatedFunds+=(float(row[4])/100*BudgetAmount)
@@ -824,7 +823,7 @@ class FinanceGUI:
 		if RemainderItems:
 			FundsInRemainder+=BudgetAmount-AllocatedFunds
 		if BudgetAmount > 0:
-			self.BudgetStatsLabel['text']=f"Total Budget Allocation:${BudgetAmount}      Unallocated Funds:${BudgetAmount-AllocatedFunds-FundsInRemainder}           Percentage of Funds Unallocated:{((BudgetAmount-AllocatedFunds-FundsInRemainder)/BudgetAmount)*100}%        Funds Allocated to the Remainder:${FundsInRemainder}/{len(RemainderItems)}"
+			self.BudgetStatsLabel['text']=f"Total Budget Allocation:${round(BudgetAmount,2)}      Unallocated Funds:${round(BudgetAmount-AllocatedFunds-FundsInRemainder, 2)}           Percentage of Funds Unallocated:{round(((BudgetAmount-AllocatedFunds-FundsInRemainder)/BudgetAmount)*100, 2)}%        Funds Allocated to the Remainder:${round(FundsInRemainder, 2)}/{len(RemainderItems)}"
 		else:
 			messagebox.showerror("Divison by Zero!", "Can't show the stats of a budget with no allocated funds!")
 

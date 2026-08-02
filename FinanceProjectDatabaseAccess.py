@@ -49,9 +49,10 @@ with lite.connect(DIR_PATH) as conn:
 					#get all the info for the account and its most recent transaction
 					#and put it in the rows list to populate the account treeview
 					MaxTransID = max(TransIDList)
-					MaxTransID=str(MaxTransID)
-					AddRows= tuple(WithTransIDAccountInfo(MaxTransID, AccountType))
-					RowGroup.insert(1,AddRows)
+					MaxTransID=int(MaxTransID)
+					AddRows= WithTransIDAccountInfo(AccountType,MaxTransID)
+					for row in AddRows:
+						RowGroup.insert(1,row)
 			if AccountType=='Real':
 				cur.execute('''SELECT Real_Account_Type,Real_Account_Note,Real_Account_Balance FROM Real_Account
 				WHERE RealAccountID NOT IN (SELECT RealAccountID FROM 'Transaction')''')
@@ -133,18 +134,20 @@ with lite.connect(DIR_PATH) as conn:
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur=conn.cursor()
+		rows=''
 		#get all the data from the database for accounts with transactions
-		cur.execute('''SELECT ?_Account.?_Account_Type,?_Account.?_Account_Balance,'Transaction'.Transaction_Type
-		,'Transaction'.Money_Transferred,'Transaction'.Date_Of_Transaction
-		FROM ?_Account INNER JOIN 'Transaction' ON ?_Account.?AccountID= 'Transaction'.?AccountID
-		WHERE TransactionID=?''',(AccountType, AccountType, AccountType
-		, AccountType, AccountType, AccountType, AccountType, AccountType, MaxTransID,))
-		rows = cur.fetchall()
-		#turn the rows into a string
-		for row in rows:
-			String =row
-			break
-		rows=String
+		if AccountType==AccountTypes.REAL:
+			cur.execute('''SELECT Real_Account.Real_Account_Type,Real_Account.Real_Account_Note,Real_Account.Real_Account_Balance,'Transaction'.Transaction_Type
+			,'Transaction'.Money_Transferred,'Transaction'.Date_Of_Transaction
+			FROM Real_Account INNER JOIN 'Transaction' ON Real_Account.RealAccountID= 'Transaction'.RealAccountID
+			WHERE TransactionID=?''',(MaxTransID,))
+			rows = cur.fetchall()
+		elif AccountType==AccountTypes.LOGICAL:
+			cur.execute('''SELECT Logical_Account.Logical_Account_Type,Logical_Account.Logical_Account_Note,Logical_Account.Logical_Account_Balance,'Transaction'.Transaction_Type
+			,'Transaction'.Money_Transferred,'Transaction'.Date_Of_Transaction
+			FROM Logical_Account INNER JOIN 'Transaction' ON Logical_Account.LogicalAccountID= 'Transaction'.LogicalAccountID
+			WHERE TransactionID=?''',(MaxTransID,))
+			rows = cur.fetchall()
 		#close the database and return rows
 		conn.close()
 		return rows	
@@ -155,35 +158,52 @@ with lite.connect(DIR_PATH) as conn:
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
-		#if the transaction amount isn't empty,
-		#convert the transaction into float and round it to two decimals
+		# if the transaction amount isn't empty and meets the required
+		# criteria for the expenditure type, convert the transaction into
+		# float and round it to two decimals. If the criteria isn't met,
+		# trigger an exception by dividing by zero.
 		if len(TransactionAmount)>0:
 			TransactionAmount=float(TransactionAmount)
 			TransactionAmount = round(TransactionAmount, 2)
 			TransactionAmount = abs(TransactionAmount)
 			if ExpenditureType == BudgetExpenditureTypes.INCOME:
+				# If the expenditure type is income and there is no
+				# chosen budget, then trigger an exception by dividing
+				# zero.
+				if ChosenBudget=='':
+					TriggerException=1/0
 				pass
 			elif ExpenditureType == BudgetExpenditureTypes.EXPENSE:
+				# If the expenditure type is expense and there is no
+				# logical or real account, then trigger an exception by dividing
+				# zero.
+				if RealAccount=='' or LogicalAccount=='':
+					TriggerException=1/0
 				TransactionAmount*=-1
 			else:
-				return
-		RealAccountID,RealAccountCurrentBalance=GetAccountIDAndBalance(RealAccount,"Real")
-		LogicalAccountID,LogicalAccountCurrentBalance=GetAccountIDAndBalance(LogicalAccount,"Logical")
-		RealAccountNewBalance=RealAccountCurrentBalance+TransactionAmount
-		RealAccountNewBalance=round(RealAccountNewBalance, 2)
-		LogicalAccountNewBalance=LogicalAccountCurrentBalance+TransactionAmount
-		LogicalAccountNewBalance=round(LogicalAccountNewBalance,2)
-		#Add transaction info into database
-		cur.execute('''INSERT INTO 'Transaction'(RealAccountID,LogicalAccountID,Date_Of_Transaction,Money_Transferred,
-		Real_Account_Previous_Balance, Real_Account_New_Balance,Logical_Account_Previous_Balance,Logical_Account_New_Balance,
-		Transaction_Type) VALUES(?,?,?,?,?,?,?,?,?)''' ,(RealAccountID,LogicalAccountID,TransactionDate,TransactionAmount,
-		RealAccountCurrentBalance,RealAccountNewBalance, LogicalAccountCurrentBalance,LogicalAccountNewBalance,TransactionType))
-		#commit the data
-		conn.commit()
-		#add the new balances for the accounts
-		cur.execute('''UPDATE Real_Account SET Balance=? WHERE RealAccountID=? ''',(RealAccountNewBalance,RealAccountID))
-		cur.execute('''UPDATE Logical_Account SET Balance=? WHERE LogicalAccountID=? ''',(LogicalAccountNewBalance,LogicalAccountID))
-		rows = cur.fetchall()
+				TriggerException=1/0
+		if ExpenditureType == BudgetExpenditureTypes.INCOME:
+			pass
+		elif ExpenditureType == BudgetExpenditureTypes.EXPENSE:
+			RealAccountID,RealAccountCurrentBalance=GetAccountIDAndBalance(RealAccount,"Real")
+			LogicalAccountID,LogicalAccountCurrentBalance=GetAccountIDAndBalance(LogicalAccount,"Logical")
+			RealAccountNewBalance=RealAccountCurrentBalance+TransactionAmount
+			RealAccountNewBalance=round(RealAccountNewBalance, 2)
+			LogicalAccountNewBalance=LogicalAccountCurrentBalance+TransactionAmount
+			LogicalAccountNewBalance=round(LogicalAccountNewBalance,2)
+			# Trigger an exception if the new balance would be negative
+			if RealAccountNewBalance<0 or LogicalAccountNewBalance<0:
+				TriggerException=1/0
+			#Add transaction info into database
+			cur.execute('''INSERT INTO 'Transaction'(RealAccountID,LogicalAccountID,Date_Of_Transaction,Money_Transferred,
+			Real_Account_Previous_Balance, Real_Account_New_Balance,Logical_Account_Previous_Balance,Logical_Account_New_Balance,
+			Transaction_Type) VALUES(?,?,?,?,?,?,?,?,?)''' ,(RealAccountID,LogicalAccountID,TransactionDate,TransactionAmount,
+			RealAccountCurrentBalance,RealAccountNewBalance, LogicalAccountCurrentBalance,LogicalAccountNewBalance,TransactionDescription))
+			#commit the data
+			conn.commit()
+			#add the new balances for the accounts
+			cur.execute('''UPDATE Real_Account SET Real_Acount_Balance=? WHERE RealAccountID=? ''',(RealAccountNewBalance,RealAccountID))
+			cur.execute('''UPDATE Logical_Account SET Logical_Account_Balance=? WHERE LogicalAccountID=? ''',(LogicalAccountNewBalance,LogicalAccountID))
 		#commit the data and close the database
 		conn.commit()
 		conn.close()
@@ -421,10 +441,37 @@ with lite.connect(DIR_PATH) as conn:
 		return rows	
 	
 
-	def AddBudgetItem(BudgetName, LogicalAccountName, BudgetAllocationType, BudgetAllocationAmount, BudgetrowNote):
+	def AddBudgetItem(BudgetName, LogicalAccountName, BudgetAllocationType, BudgetAllocationAmount, BudgetRowNote):
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
+		# Determine if there's remaining funds in the budget to prevent
+		# the program crashing.
+		BudgetStats=GetBudgetInfo(BudgetName)
+		BudgetAmount=BudgetStats[0]
+		BudgetAmount=float(BudgetAmount[3])
+		BudgetItems=GetBudgetItems(BudgetName)
+		BudgetItems.append(['','','',BudgetAllocationType,BudgetAllocationAmount])
+		AllocatedFunds=float()
+		FundsInRemainder=float()
+		RemainderItems=[]
+		if BudgetItems:
+			for row in BudgetItems:
+				AllocationType=row[3]
+				if AllocationType==BudgetAllocationTypes.PERCENTAGE:
+								AllocatedFunds+=round(((float(row[4])/100) * (BudgetAmount)),2)
+				elif AllocationType==BudgetAllocationTypes.REMAINDER:
+					RemainderItems.append(row)
+				elif AllocationType==BudgetAllocationTypes.FIXED:
+					AllocatedFunds+=round(float(row[4]), 2)
+		if RemainderItems:
+					FundsInRemainder+=BudgetAmount-AllocatedFunds
+		AllocatedFunds=round(AllocatedFunds, 2)
+		if RemainderItems and AllocatedFunds==BudgetAmount:
+			TriggerException=1/0
+		if AllocatedFunds>BudgetAmount:
+			TriggerException=1/0
+
 		if BudgetAllocationType == BudgetAllocationTypes.REMAINDER:
 			BudgetAllocationAmount=0
 		# Insert the new budget allocation entry into the Budget_Allocation table
@@ -457,7 +504,7 @@ with lite.connect(DIR_PATH) as conn:
 		LogicalAccountID=int(LogicalAccountID[0])
 		# Insert the new budget row into the Budget_Item table
 		cur.execute('''INSERT INTO Budget_Item (BudgetID, LogicalAccountID, BudgetAllocationID,Budget_Item_Note)VALUES(?,?,?,?)''', 
-			(BudgetID,LogicalAccountID,BudgetAllocationID,BudgetrowNote))
+			(BudgetID,LogicalAccountID,BudgetAllocationID,BudgetRowNote))
 		conn.commit()
 		#close the database and return rows
 		conn.close()
@@ -522,7 +569,8 @@ with lite.connect(DIR_PATH) as conn:
 			cur.execute('''SELECT RealAccountID FROM Real_Account WHERE Real_Account_Type=?''',(AccountName,))
 			AccountID=cur.fetchall()
 			AccountID=TupleToString(AccountID)
-			AccountID=AccountID[0]	
+			AccountID=AccountID[0]
+			AccountID=AccountID[0]		
 			AccountID=int(AccountID)
 			cur.execute('SELECT Real_Account_Balance FROM Real_Account WHERE RealAccountID = ?',(AccountID,))
 			PreviousBalance =cur.fetchall()
@@ -531,12 +579,14 @@ with lite.connect(DIR_PATH) as conn:
 			cur.execute('''SELECT LogicalAccountID FROM Logical_Account WHERE Logical_Account_Type=?''',(AccountName,))
 			AccountID=cur.fetchall()
 			AccountID=TupleToString(AccountID)
-			AccountID=AccountID[0]	
+			AccountID=AccountID[0]
+			AccountID=AccountID[0]
 			AccountID=int(AccountID)
 			cur.execute('SELECT Logical_Account_Balance FROM Logical_Account WHERE LogicalAccountID = ?',(AccountID,))
 			PreviousBalance =cur.fetchall()
 		#Turn previous balance from tuple to float
 		PreviousBalance=TupleToString(PreviousBalance)
+		PreviousBalance=PreviousBalance[0]
 		PreviousBalance=PreviousBalance[0]
 		PreviousBalance = float(PreviousBalance)
 		PreviousBalance = round(PreviousBalance, 2)
