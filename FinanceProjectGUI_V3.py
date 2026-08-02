@@ -22,6 +22,10 @@ class BudgetExpenditureTypes(StrEnum):
 	INCOME="Income"
 	Expense="Expense"
 
+class AccountTypes(StrEnum):
+	REAL="Real"
+	LOGICAL="Logical"
+
 # Create Finance GUI class
 class FinanceGUI:
 	def __init__(self):
@@ -226,7 +230,7 @@ class FinanceGUI:
 		self.LogicalAccountLabel=tk.Label(self.HandleAccountFrame, text='Logical Account')
 		self.LogicalAccountDropdown=ttk.Combobox(self.HandleAccountFrame)
 		self.IncomeOrExpenseLabel=tk.Label(self.HandleAccountFrame, text='Income or Expense')
-		self.IncomeOrExpenseDropdown=ttk.Combobox(self.HandleAccountFrame,values=['Income','Expensive'])
+		self.IncomeOrExpenseDropdown=ttk.Combobox(self.HandleAccountFrame,values=['Income','Expense'])
 		self.BudgetLabel=tk.Label(self.HandleAccountFrame, text='Budget (If Income)')
 		self.BudgetDropdown=ttk.Combobox(self.HandleAccountFrame)
 		self.TransactionAmountLabel=tk.Label(self.HandleAccountFrame, text='Transaction Amount')
@@ -400,33 +404,9 @@ class FinanceGUI:
 			Year=self.YearofTransEntry.get()
 			TransactionDate=Month+'-'+Day+'-'+Year
 			TransactionDescription=self.TransactionTypeEntry.get()
-			#Calls the Handle Account Function from the other module to interact with the database
-			FinanceProjectDatabaseAccess.HandleAccount(RealAccount, LogicalAccount,ExpenditureType,ChosenBudget, TransactionAmount, TransactionDate,TransactionDescription)
-			# Repopulate treeviews with data after the changes are made to represent them
-			self.RepopulateAccountsTreeview()
-			self.RepopulateTransactionsTreeview()
-			self.TransactionEntry.delete(0, END)
-			self.TransactionTypeEntry.delete(0, END)
-			self.YearofTransEntry.delete(0,END)
-			self.DayofTransEntry.delete(0,END)
-			self.MonthofTransEntry.delete(0,END)
-		try:
-			# Get data for Transaction
-			self.selected = self.AccountsInfoTreeview.focus()
-			self.Account = self.AccountsInfoTreeview.item(self.selected, 'values')
-			self.Month=self.MonthofTransEntry.get()
-			self.Day = self.DayofTransEntry.get()
-			self.Year=self.YearofTransEntry.get()
-			self.TransactionDate=self.Month+'-'+self.Day+'-'+self.Year
-			self.TransactionAmount = self.TransactionEntry.get()
-			self.TransactionType = self.TransactionTypeEntry.get()
-			#if any of the date entries can't be converted to integers then the exception handling will kick in
-			self.MonthTest= int(self.Month)
-			self.DayTest= int(self.Day)
-			self.YearTest=int(self.Year)
 			#If any of the entries are unpopulated or aren't within the proper date range, it sends an error message and the core code isn't executed
-			if self.TransactionAmount =='' or self.TransactionType == '' or self.Month=='' or self.Year==''or self.Day==''\
-			or self. MonthTest > 12 or self. MonthTest<1 or self.DayTest<0 or self.DayTest>31 or self.YearTest < 2023  :
+			if RealAccount=='' or LogicalAccount=='' or ExpenditureType=='' or ChosenBudget=='' or TransactionAmount =='' or TransactionDescription == '' \
+			or Month=='' or Year==''or Day=='' or int(Month) > 12 or int(Month)<1 or int(Day)<0 or int(Day)>31 or int(Year) < 2026  :
 				# Create an error message variable
 				self.ErrorMessage = 'Error! Follow the directions and please try again.'
 				# Display the error message in an info dialog box.
@@ -434,15 +414,19 @@ class FinanceGUI:
 			# The core code
 			else:
 				#Calls the Handle Account Function from the other module to interact with the database
-				FinanceProjectDatabaseAccess.HandleAccount(self.Account, self.TransactionDate, self.TransactionAmount, self.TransactionType)
+				FinanceProjectDatabaseAccess.HandleAccount(RealAccount, LogicalAccount,ExpenditureType,ChosenBudget, TransactionAmount, TransactionDate,TransactionDescription)
 				# Repopulate treeviews with data after the changes are made to represent them
 				self.RepopulateAccountsTreeview()
 				self.RepopulateTransactionsTreeview()
-				self.TransactionEntry.delete(0, END)
-				self.TransactionTypeEntry.delete(0, END)
-				self.YearofTransEntry.delete(0,END)
-				self.DayofTransEntry.delete(0,END)
+				self.RealAccountDropdown.delete(0,END)
+				self.LogicalAccountDropdown.delete(0,END)
+				self.IncomeOrExpenseDropdown.delete(0,END)
+				self.BudgetDropdown.delete(0,END)
+				self.TransactionAmountField.delete(0,END)
 				self.MonthofTransEntry.delete(0,END)
+				self.DayofTransEntry.delete(0,END)
+				self.YearofTransEntry.delete(0,END)
+				TransactionDescription=self.TransactionTypeEntry.delete(0,END)
 		except:
 			#Create an error message variable
 			self.ErrorMessage ='Error! Follow the directions and please try again.'

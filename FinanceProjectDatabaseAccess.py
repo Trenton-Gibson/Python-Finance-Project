@@ -7,6 +7,7 @@ import sqlite3 as lite
 import os.path
 from FinanceProjectGUI_V3 import BudgetAllocationTypes
 from FinanceProjectGUI_V3 import BudgetExpenditureTypes
+from FinanceProjectGUI_V3 import AccountTypes
 #Specify the specific filepath of the database so it can be used in the python interpreter
 # and establish a connection with the finances database
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -166,60 +167,22 @@ with lite.connect(DIR_PATH) as conn:
 				TransactionAmount*=-1
 			else:
 				return
-		#get the account number
-		UntransformedAccountInfo = str(AccountInfo[0])
-		AccountInfo=''
-		for row in UntransformedAccountInfo:
-			AccountInfo+=row
-		cur.execute('''SELECT RealAccountID FROM Real_Account WHERE Real_Account_Type=?''',(AccountInfo,))
-		AccountNum=cur.fetchall()
-		for row in AccountNum:
-			String = str(row)
-			String = String.lstrip('(')
-			String = String.rstrip(')')
-			String = String.rstrip(',')
-			AccountNum = (String)
-		#retrive the previous balance for the specific account
-		cur.execute('SELECT Real_Account_Balance FROM Real_Account WHERE RealAccountID = ?',(AccountNum,))
-		PreviousBalance =cur.fetchall()
-		
-		#turn previous balance tuple into string
-		for row in PreviousBalance:
-			String = str(row)
-			String = String.lstrip('(')
-			String = String.rstrip(')')
-			String = String.rstrip(',')
-			PreviousBalance=(String)
-		#turn previous balance into float and round it
-		PreviousBalance = float(PreviousBalance)
-		PreviousBalance = round(PreviousBalance, 2)
-		# if the transaction amount isn't 0,
-		#get the new balance and round it
-		if TransactionAmount!=0:
-			NewBalance=PreviousBalance+TransactionAmount
-			NewBalance = round(NewBalance, 2)
-		#select the highest transactionID
-		cur.execute('SELECT max(TransactionID) FROM "Transaction"')
-		TransID=cur.fetchall()
-		#Convert the maximum transaction into int
-		#and make the next transaction ID
-		for row in TransID:
-			String = str(row)
-			String = String.lstrip('(')
-			String = String.rstrip(')')
-			String = String.rstrip(',')
-			if String == 'None':
-				NewTransID=1
-			else:
-				NewTransID = float(String) + 1
+		RealAccountID,RealAccountCurrentBalance=GetAccountIDAndBalance(RealAccount,"Real")
+		LogicalAccountID,LogicalAccountCurrentBalance=GetAccountIDAndBalance(LogicalAccount,"Logical")
+		RealAccountNewBalance=RealAccountCurrentBalance+TransactionAmount
+		RealAccountNewBalance=round(RealAccountNewBalance, 2)
+		LogicalAccountNewBalance=LogicalAccountCurrentBalance+TransactionAmount
+		LogicalAccountNewBalance=round(LogicalAccountNewBalance,2)
 		#Add transaction info into database
-		cur.execute('''INSERT INTO 'Transaction'VALUES(?,?,?,?,?,?,?)'''
-		,(NewTransID,AccountNum,TransactionDate,TransactionAmount,PreviousBalance,NewBalance,TransactionType))
-		rows=cur.fetchall()
+		cur.execute('''INSERT INTO 'Transaction'(RealAccountID,LogicalAccountID,Date_Of_Transaction,Money_Transferred,
+		Real_Account_Previous_Balance, Real_Account_New_Balance,Logical_Account_Previous_Balance,Logical_Account_New_Balance,
+		Transaction_Type) VALUES(?,?,?,?,?,?,?,?,?)''' ,(RealAccountID,LogicalAccountID,TransactionDate,TransactionAmount,
+		RealAccountCurrentBalance,RealAccountNewBalance, LogicalAccountCurrentBalance,LogicalAccountNewBalance,TransactionType))
 		#commit the data
 		conn.commit()
-		#add the new balance for the account
-		cur.execute('''UPDATE Real_Account SET Balance=? WHERE RealAccountID=? ''',(NewBalance,AccountNum))
+		#add the new balances for the accounts
+		cur.execute('''UPDATE Real_Account SET Balance=? WHERE RealAccountID=? ''',(RealAccountNewBalance,RealAccountID))
+		cur.execute('''UPDATE Logical_Account SET Balance=? WHERE LogicalAccountID=? ''',(LogicalAccountNewBalance,LogicalAccountID))
 		rows = cur.fetchall()
 		#commit the data and close the database
 		conn.commit()
@@ -546,3 +509,37 @@ with lite.connect(DIR_PATH) as conn:
 		cur.execute('''DELETE FROM Budget_Item WHERE BudgetItemID=?''',(BudgetItemID,))
 		conn.commit()
 		conn.close()
+
+	#get the account ID and account's current balance
+	def GetAccountIDAndBalance(AccountName, AccountType):
+		# connect to the database and make a cursor
+		conn = lite.connect(DIR_PATH)
+		cur = conn.cursor()
+		AccountID=""
+		PreviousBalance=0.0
+		# get ID and balance if account type is real
+		if AccountType==AccountTypes.REAL:
+			cur.execute('''SELECT RealAccountID FROM Real_Account WHERE Real_Account_Type=?''',(AccountName,))
+			AccountID=cur.fetchall()
+			AccountID=TupleToString(AccountID)
+			AccountID=AccountID[0]	
+			AccountID=int(AccountID)
+			cur.execute('SELECT Real_Account_Balance FROM Real_Account WHERE RealAccountID = ?',(AccountID,))
+			PreviousBalance =cur.fetchall()
+		# get ID and balance if account type is real
+		if AccountType==AccountTypes.LOGICAL:
+			cur.execute('''SELECT LogicalAccountID FROM Logical_Account WHERE Logical_Account_Type=?''',(AccountName,))
+			AccountID=cur.fetchall()
+			AccountID=TupleToString(AccountID)
+			AccountID=AccountID[0]	
+			AccountID=int(AccountID)
+			cur.execute('SELECT Logical_Account_Balance FROM Logical_Account WHERE LogicalAccountID = ?',(AccountID,))
+			PreviousBalance =cur.fetchall()
+		#Turn previous balance from tuple to float
+		PreviousBalance=TupleToString(PreviousBalance)
+		PreviousBalance=PreviousBalance[0]
+		PreviousBalance = float(PreviousBalance)
+		PreviousBalance = round(PreviousBalance, 2)
+		# close database connection
+		conn.close()
+		return AccountID, PreviousBalance	
