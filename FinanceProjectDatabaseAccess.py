@@ -167,10 +167,12 @@ with lite.connect(DIR_PATH) as conn:
 			TransactionAmount = round(TransactionAmount, 2)
 			TransactionAmount = abs(TransactionAmount)
 			if ExpenditureType == BudgetExpenditureTypes.INCOME:
+				print(GetBudgetInfo(ChosenBudget))
+				BudgetAmount=float(GetBudgetInfo(ChosenBudget)[0][3])
 				# If the expenditure type is income and there is no
 				# chosen budget, then trigger an exception by dividing
 				# zero.
-				if ChosenBudget=='':
+				if ChosenBudget=='' or RealAccount=='' or BudgetAmount>TransactionAmount:
 					TriggerException=1/0
 				pass
 			elif ExpenditureType == BudgetExpenditureTypes.EXPENSE:
@@ -183,7 +185,44 @@ with lite.connect(DIR_PATH) as conn:
 			else:
 				TriggerException=1/0
 		if ExpenditureType == BudgetExpenditureTypes.INCOME:
-			pass
+			RealAccountID,RealAccountCurrentBalance=GetAccountIDAndBalance(RealAccount,"Real")
+			RealAccountNewBalance=RealAccountCurrentBalance+TransactionAmount
+			RealAccountNewBalance=round(RealAccountNewBalance, 2)
+			# add the new balance for the real account
+			cur.execute('''UPDATE Real_Account SET Real_Account_Balance=? WHERE RealAccountID=? ''',(RealAccountNewBalance,RealAccountID))
+			#commit the data
+			conn.commit()
+			BudgetItems=GetBudgetItems(ChosenBudget)
+			RemainderItemCount=0
+			for item in BudgetItems:
+				BudgetAllocationType=item[3]
+				if BudgetAllocationType==BudgetAllocationTypes.REMAINDER:
+					RemainderItemCount+=1
+			for item in BudgetItems:
+				LogicalAccountName=item[2]
+				LogicalAccountID,LogicalAccountCurrentBalance=GetAccountIDAndBalance(LogicalAccountName,"Logical")
+				BudgetAllocationType=item[3]
+				BudgetAllocationAmount=float(item[4])
+				if BudgetAllocationType==BudgetAllocationTypes.FIXED:
+					LogicalAccountNewBalance=LogicalAccountCurrentBalance+BudgetAllocationAmount
+					LogicalAccountNewBalance=round(LogicalAccountNewBalance,2)
+				elif BudgetAllocationType==BudgetAllocationTypes.PERCENTAGE:
+					LogicalAccountNewBalance=LogicalAccountCurrentBalance+(float(BudgetAllocationAmount)/100*TransactionAmount)
+					LogicalAccountNewBalance=round(LogicalAccountNewBalance,2)
+				elif BudgetAllocationType==BudgetAllocationTypes.REMAINDER:
+					LogicalAccountNewBalance=LogicalAccountCurrentBalance+((BudgetAllocationAmount)/RemainderItemCount)
+					LogicalAccountNewBalance=round(LogicalAccountNewBalance,2)
+				#Add transaction info into database
+				cur.execute('''INSERT INTO 'Transaction'(RealAccountID,LogicalAccountID,Date_Of_Transaction,Money_Transferred,
+				Real_Account_Previous_Balance, Real_Account_New_Balance,Logical_Account_Previous_Balance,Logical_Account_New_Balance,
+				Transaction_Type) VALUES(?,?,?,?,?,?,?,?,?)''' ,(RealAccountID,LogicalAccountID,TransactionDate,BudgetAllocationAmount,
+				RealAccountCurrentBalance,RealAccountNewBalance, LogicalAccountCurrentBalance,LogicalAccountNewBalance,TransactionDescription))
+				#commit the data
+				conn.commit()
+				#add the new balances for the accounts
+				cur.execute('''UPDATE Logical_Account SET Logical_Account_Balance=? WHERE LogicalAccountID=? ''',(LogicalAccountNewBalance,LogicalAccountID))
+				#commit the data
+				conn.commit()
 		elif ExpenditureType == BudgetExpenditureTypes.EXPENSE:
 			RealAccountID,RealAccountCurrentBalance=GetAccountIDAndBalance(RealAccount,"Real")
 			LogicalAccountID,LogicalAccountCurrentBalance=GetAccountIDAndBalance(LogicalAccount,"Logical")
@@ -204,8 +243,9 @@ with lite.connect(DIR_PATH) as conn:
 			#add the new balances for the accounts
 			cur.execute('''UPDATE Real_Account SET Real_Acount_Balance=? WHERE RealAccountID=? ''',(RealAccountNewBalance,RealAccountID))
 			cur.execute('''UPDATE Logical_Account SET Logical_Account_Balance=? WHERE LogicalAccountID=? ''',(LogicalAccountNewBalance,LogicalAccountID))
-		#commit the data and close the database
-		conn.commit()
+			#commit the data
+			conn.commit()
+		#close the database
 		conn.close()
 		
 		
@@ -432,7 +472,7 @@ with lite.connect(DIR_PATH) as conn:
 		cur.execute('''SELECT Budget.Budget_Name, Budget_Item.BudgetItemID, Logical_Account.Logical_Account_Type, Budget_Allocation.Budget_Allocation_Type, Budget_Allocation.Budget_Allocation_Amount,
 		Budget_Item.Budget_Item_Note FROM Budget_Item INNER JOIN Logical_Account ON Budget_Item.LogicalAccountID = Logical_Account.LogicalAccountID
 		INNER JOIN Budget_Allocation ON Budget_Item.BudgetAllocationID = Budget_Allocation.BudgetAllocationID
-		INNER JOIN Budget ON Budget_Item.BudgetID = Budget.BudgetID  WHERE Budget.Budget_Name=?''', (BudgetName,))
+		INNER JOIN Budget ON Budget_Item.BudgetID = Budget.BudgetID  WHERE Budget.Budget_Name=? ORDER BY Budget_Allocation.Budget_Allocation_Type ASC''', (BudgetName,))
 		# Fetch the rows from the SELECT query
 		rows = cur.fetchall()
 		rows=TupleToString(rows)
@@ -474,6 +514,8 @@ with lite.connect(DIR_PATH) as conn:
 
 		if BudgetAllocationType == BudgetAllocationTypes.REMAINDER:
 			BudgetAllocationAmount=0
+		if (BudgetAllocationType == BudgetAllocationTypes.PERCENTAGE or BudgetAllocationType==BudgetAllocationTypes.FIXED) and BudgetAllocationAmount==0:
+			ExceptionTrigger=1/0
 		# Insert the new budget allocation entry into the Budget_Allocation table
 		cur.execute('''INSERT INTO Budget_Allocation (Budget_Allocation_Type, Budget_Allocation_Amount)VALUES(?,?)'''
 			,(BudgetAllocationType,BudgetAllocationAmount))

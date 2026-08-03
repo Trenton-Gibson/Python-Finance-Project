@@ -225,7 +225,7 @@ class FinanceGUI:
 		#Create Top Middle Frame Widgets
 		## Create handle account frame widgets
 		self.TransactionLabel = tk.Label(self.HandleAccountFrame, text='Transaction Entry')
-		self.RealAccountLabel = tk.Label(self.HandleAccountFrame,text='Real Account (If Expense)')
+		self.RealAccountLabel = tk.Label(self.HandleAccountFrame,text='Real Account')
 		self.RealAccountDropdown=ttk.Combobox(self.HandleAccountFrame)
 		self.LogicalAccountLabel=tk.Label(self.HandleAccountFrame, text='Logical Account (If Expense)')
 		self.LogicalAccountDropdown=ttk.Combobox(self.HandleAccountFrame)
