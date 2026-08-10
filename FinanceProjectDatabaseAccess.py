@@ -311,103 +311,96 @@ with lite.connect(DIR_PATH) as conn:
 	
 	
 	#Handles all the database transactions for transferring money between accounts
-	def AccountTransfer(AmountTransferred,GivingAccount,RecipientAccount):
+	def AccountTransfer(ExpendingAccount, RecipientAccount,TransferAmount,TransferDescription):
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
 		#transform the amount transferred parameter into float data that is rounded
-		AmountTransferred=float(AmountTransferred)
-		AmountTransferred = round(AmountTransferred, 2)
-		#obtains the highest transactionID and makes the next one
-		cur.execute('SELECT max(TransactionID) FROM "Transaction"')
-		TransID = cur.fetchall()
-		for row in TransID:
-			String = str(row)
-			String = String.lstrip('(')
-			String = String.rstrip(')')
-			String = String.rstrip(',')
-			if TransID:
-				NewTransID=int(String)+1
-			else:
-				NewTransID=1
-		#get the account Id of the recipient account and transform it into integer data
-		cur.execute('''SELECT RealAccountID FROM Real_Account WHERE Real_Account_Type=?''',(RecipientAccount,))
-		AccountNum=cur.fetchall()
-		for row in AccountNum:
-			String = str(row)
-			String = String.lstrip('(')
-			String = String.rstrip(')')
-			String = String.rstrip(',')
-			AccountNum=int(String)
-			
-		#get the balance for the recipient account and turn it into float data and round it
-		cur.execute('SELECT Balance FROM Real_Account WHERE RealAccountID = ?', (AccountNum,))
-		PreviousBalance = cur.fetchall()
-		for row in PreviousBalance:
-			String = str(row)
-			String = String.lstrip('(')
-			String = String.rstrip(')')
-			String = String.rstrip(',')
-			PreviousBalance = (String)
-		PreviousBalance = float(PreviousBalance)
-		PreviousBalance = round(PreviousBalance, 2)
-		#get the new balance for recipient account and insert all the data for the recipient account
-		NewBalance = PreviousBalance + AmountTransferred
-		NewBalance = round(NewBalance, 2)
-		cur.execute('''INSERT INTO 'Transaction'VALUES(?,?,date('now','-5 hours'),?,?,?,'Recipient of transfer')'''
-		,(NewTransID,AccountNum,AmountTransferred,PreviousBalance,NewBalance))
-		cur.execute('''UPDATE Real_Account SET Balance=Balance+? WHERE Real_Account_Type=?''',
-					(AmountTransferred, RecipientAccount))
-		cur.execute('''UPDATE Real_Account SET Balance=round(Balance,2) WHERE Real_Account_Type=?''', (RecipientAccount,))
-		# obtains the highest transactionID and makes the next one
-		cur.execute('SELECT max(TransactionID) FROM "Transaction"')
-		TransID = cur.fetchall()
-		for row in TransID:
-			String = str(row)
-			String = String.lstrip('(')
-			String = String.rstrip(')')
-			String = String.rstrip(',')
-			NewTransID = int(String) + 1
-		# get the account Id of the giving account and transform it into integer data
-		cur.execute('''SELECT RealAccountID FROM Real_Account WHERE Real_Account_Type=?''', (GivingAccount,))
-		AccountNum = cur.fetchall()
-		for row in AccountNum:
-			String = str(row)
-			String = String.lstrip('(')
-			String = String.rstrip(')')
-			String = String.rstrip(',')
-			AccountNum = int(String)
-		# get the balance for the giving account and turn it into float data and round it
-		cur.execute('SELECT Balance FROM Real_Account WHERE RealAccountID = ?', (AccountNum,))
-		PreviousBalance = cur.fetchall()
-		for row in PreviousBalance:
-			String = str(row)
-			String = String.lstrip('(')
-			String = String.rstrip(')')
-			String = String.rstrip(',')
-			PreviousBalance = (String)
-		#turn amount transferred, previous balance, and new balance into float data and round to the second decimal place.
-		#Amount transferred is made negative because the giving account is giving the money away.
-		#New balance is made from previous balance and the now negative amount transferred.
-		AmountTransferred = float(AmountTransferred)
-		AmountTransferred=-1*(AmountTransferred)
-		AmountTransferred = round(AmountTransferred, 2)
-		PreviousBalance = float(PreviousBalance)
-		PreviousBalance = round(PreviousBalance, 2)
-		NewBalance = PreviousBalance + AmountTransferred
-		NewBalance = round(NewBalance, 2)
-		# make and commit database transactions for giving account, and close the database.
-		cur.execute('''INSERT INTO 'Transaction'VALUES(?,?,date('now','-5 hours'),?,?,?,'Giver of Transfer')'''
-					, (NewTransID, AccountNum, AmountTransferred, PreviousBalance, NewBalance))
-		cur.execute('''UPDATE Real_Account SET Balance=Balance+? WHERE Real_Account_Type=?''',
-					(AmountTransferred, GivingAccount))
-		cur.execute('''UPDATE Real_Account SET Balance=round(Balance,2) WHERE Real_Account_Type=?''',(GivingAccount,))
+		TransferAmount=float(TransferAmount)
+		TransferAmount = round(TransferAmount, 2)
+		#Check to make sure both accounts are logical or real and not mixed
+		ExpendingAccountID=int()
+		RecipientAccountID=int()
+		cur.execute('''SELECT RealAccountID FROM Real_Account WHERE Real_Account_Type=? AND Real_Account_Type=?''',(ExpendingAccount, RecipientAccount))
+		RealAccountIDs=cur.fetchall()
+		RealAccountCount=0
+		for item in RealAccountIDs:
+			RealAccountCount+=1
+		cur.execute('''SELECT LogicalAccountID FROM Logical_Account WHERE Logical_Account_Type=? AND Logical_Account_Type=?''',(ExpendingAccount, RecipientAccount))
+		LogicalAccountIDs=cur.fetchall()
+		LogicalAccountCount=0
+		for item in LogicalAccountIDs:
+			LogicalAccountCount+=1
+		LogicalAccountID1=int()
+		LogicalAccountID2=int()
+		RealAccountID1=int()
+		RealAccountID2=int()
+		if RealAccountCount==2:
+			# get all account ids and account balances for all the proceeding SQL for this function
+			ExpendingAccountID,ExpendingAccountCurrentBalance=GetAccountIDAndBalance(ExpendingAccount,"Real")
+			RecipientAccountID,RecipientAccountCurrentBalance=GetAccountIDAndBalance(RecipientAccount,"Real")
+			cur.execute('SELECT LogicalAccountID FROM Logical_Account WHERE LogicalAccountID>=0')
+			LogicalAccountID=cur.fetchall()
+			LogicalAccountID1=LogicalAccountID[0]
+			LogicalAccountID2=LogicalAccountID1
+			RealAccountID1=ExpendingAccountID
+			RealAccountID2=RecipientAccountID
+			# update balances for real accounts
+			ExpendingAccountNewBalance=ExpendingAccountCurrentBalance-TransferAmount
+			ExpendingAccountNewBalance=round(ExpendingAccountNewBalance, 2)
+			RecipientAccountNewBalance=RecipientAccountCurrentBalance+TransferAmount
+			RecipientAccountNewBalance=round(RecipientAccountNewBalance,2)
+			# Trigger an exception if the new balances would be negative
+			if ExpendingAccountNewBalance<0 or RecipientAccountNewBalance<0:
+				TriggerException=1/0
+			#add the new balances for the accounts
+			cur.execute('''UPDATE Real_Account SET Real_Acount_Balance=? WHERE RealAccountID=? ''',(ExpendingAccountNewBalance,ExpendingAccountID))
+			cur.execute('''UPDATE Real_Account SET Real_Account_Balance=? WHERE RealAccountID=? ''',(RecipientAccountNewBalance,RecipientAccountID))
+			#commit the data
+			conn.commit()
+		elif LogicalAccountCount==2:
+			# get all account ids and account balances for all the proceeding SQL for this function
+			ExpendingAccountID,ExpendingAccountCurrentBalance=GetAccountIDAndBalance(ExpendingAccount,"Logical")
+			RecipientAccountID,RecipientAccountCurrentBalance=GetAccountIDAndBalance(RecipientAccount,"Logical")
+			cur.execute('SELECT RealAccountID FROM Real_Account WHERE RealAccountID>=0')
+			RecalAccountID=cur.fetchall()
+			LogicalAccountID1=ExpendingAccountID
+			LogicalAccountID2=ExpendingAccountID
+			RealAccountID1=RealAccountID[0]
+			RealAccountID2=RealAccountID1
+			# update balances for logical accounts
+			ExpendingAccountNewBalance=ExpendingAccountCurrentBalance-TransferAmount
+			ExpendingAccountNewBalance=round(ExpendingAccountNewBalance, 2)
+			RecipientAccountNewBalance=RecipientAccountCurrentBalance+TransferAmount
+			RecipientAccountNewBalance=round(RecipientAccountNewBalance,2)
+			# Trigger an exception if the new balances would be negative
+			if ExpendingAccountNewBalance<0 or RecipientAccountNewBalance<0:
+				TriggerException=1/0
+			#add the new balances for the accounts
+			cur.execute('''UPDATE Logical_Account SET Logical_Acount_Balance=? WHERE LogicalAccountID=? ''',(ExpendingAccountNewBalance,ExpendingAccountID))
+			cur.execute('''UPDATE Logical_Account SET Logical_Account_Balance=? WHERE LogicalAccountID=? ''',(RecipientAccountNewBalance,RecipientAccountID))
+			#commit the data
+			conn.commit()
+		else:
+			TriggerException=1/0
+
+		#Add transaction info into database
+		cur.execute('''INSERT INTO 'Transaction'(RealAccountID,LogicalAccountID,Date_Of_Transaction,Money_Transferred,
+		Real_Account_Previous_Balance, Real_Account_New_Balance,Logical_Account_Previous_Balance,Logical_Account_New_Balance,
+		Transaction_Type) VALUES(?,?,?,?,?,?,?,?,?)''' ,(RealAccountID1,LogicalAccountID1,TransactionDate,-TransferAmount,
+		RealAccountCurrentBalance,RealAccountNewBalance, LogicalAccountCurrentBalance,LogicalAccountNewBalance,TransactionDescription))
+		#commit the data
+		conn.commit()
+		#Add transaction info into database
+		cur.execute('''INSERT INTO 'Transaction'(RealAccountID,LogicalAccountID,Date_Of_Transaction,Money_Transferred,
+		Real_Account_Previous_Balance, Real_Account_New_Balance,Logical_Account_Previous_Balance,Logical_Account_New_Balance,
+		Transaction_Type) VALUES(?,?,?,?,?,?,?,?,?)''' ,(RealAccountID2,LogicalAccountID2,TransactionDate,TransactionAmount,
+		RealAccountCurrentBalance,RealAccountNewBalance, LogicalAccountCurrentBalance,LogicalAccountNewBalance,TransactionDescription))
+		#commit the data
 		conn.commit()
 		conn.close()
 		
-		##Handles the transformation of account names on the database side
-	
-	
+	#Handles the transformation of account names on the database side
 	def RenamingAccount(ToBeChangedAccount,NewName,NewDescription):
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)

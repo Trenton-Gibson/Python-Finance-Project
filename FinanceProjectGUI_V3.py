@@ -526,19 +526,20 @@ class FinanceGUI:
 	def TransferringMoney(self):
 		try:
 			#get accounts transferring and amount of money being transferred
-			self.TransferredMoney = self.AmountTransferredEntry.get()
-			self.TransMonGivingAccount = self.GivingAccount
-			self.TransMonRecipientAccount = self.RecipientAccount
+			ExpendingAccount=self.ExpendingAccountDropdown.get()
+			RecipientAccount=self.RecipientAccountDropdown.get()
+			TransferAmount=self.TransferAmountField.get()
+			TransferDescription=self.TransferDescriptionField.get()
 			#if any of the values are empty then an error message will pop up and the core code will not execute
-			if self.TransferredMoney == '' or self.TransMonGivingAccount == '' \
-			or self.TransMonRecipientAccount=='' or self.TransferredMoney==self.TransferredMoney.isalpha():
+			if ExpendingAccount == '' or RecipientAccount == '' or TransferAmount==self.TransferredMoney.isalpha()\
+			or TransferAmount=='' or TransferDescription=='' :
 				# Create an error message variable
 				self.ErrorMessage = 'Error! Follow the directions and please try again.'
 				# Display the error message in an info dialog box.
 				tk.messagebox.showinfo('Error!', self.ErrorMessage)
 			else:
 				#Calls Account transfer function which will handle the database interactions for transferring money
-				FinanceProjectDatabaseAccess.AccountTransfer(self.TransferredMoney, self.TransMonGivingAccount, self.TransMonRecipientAccount)
+				FinanceProjectDatabaseAccess.AccountTransfer(ExpendingAccount, RecipientAccount,TransferAmount,TransferDescription)
 				# Repopulate treeviews with data
 				self.RepopulateAccountsTreeview()
 				self.RepopulateTransactionsTreeview()
