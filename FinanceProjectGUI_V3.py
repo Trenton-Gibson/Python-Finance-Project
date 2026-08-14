@@ -273,9 +273,11 @@ class FinanceGUI:
 		self.RecipientAccountDropdown=ttk.Combobox(self.TransferMoneyFrame)
 		self.TransferAmountLabel=tk.Label(self.TransferMoneyFrame,text='Transfer Amount')
 		self.TransferAmountField=tk.Entry(self.TransferMoneyFrame)
+		self.TransferDateLabel=tk.Label(self.TransferMoneyFrame,text='Transfer Date')
+		self.TransferDateField=tk.Entry(self.TransferMoneyFrame)
 		self.TransferDescriptionLabel=tk.Label(self.TransferMoneyFrame, text='Transfer Description')
 		self.TransferDescriptionField=tk.Entry(self.TransferMoneyFrame)
-		self.RecordTransferButton = tk.Button(self.TransferMoneyFrame, text='Record Transfer', command=self.GetGivingAccount)
+		self.RecordTransferButton = tk.Button(self.TransferMoneyFrame, text='Record Transfer', command=self.TransferringMoney)
 		## Pack Transfer money frame widgets
 		self.MoneyTransferLabel.grid(row=0, column=0, columnspan=2)
 		self.ExpendingAccountLabel.grid(row=1, column=0)
@@ -284,9 +286,11 @@ class FinanceGUI:
 		self.RecipientAccountDropdown.grid(row=2, column=1)
 		self.TransferAmountLabel.grid(row=3, column=0)
 		self.TransferAmountField.grid(row=3, column=1)
-		self.TransferDescriptionLabel.grid(row=4, column=0)
-		self.TransferDescriptionField.grid(row=4, column=1)
-		self.RecordTransferButton.grid(row=5, column=0, columnspan=2)
+		self.TransferDateLabel.grid(row=4, column=0)
+		self.TransferDateField.grid(row=4, column=1)
+		self.TransferDescriptionLabel.grid(row=5, column=0)
+		self.TransferDescriptionField.grid(row=5, column=1)
+		self.RecordTransferButton.grid(row=6, column=0, columnspan=2)
 		## Create transaction history frame widgets
 		self.TransactionHistoryLabel = tk.Label(self.TransactionHistoryFrame, text='Transaction History')
 		self.AccountChoiceLabel = tk.Label(self.TransactionHistoryFrame, text='Account Choice')
@@ -524,35 +528,39 @@ class FinanceGUI:
 			
 	#Handles transferring money between two accounts
 	def TransferringMoney(self):
-		try:
+		# try:
+			print("working?")
 			#get accounts transferring and amount of money being transferred
 			ExpendingAccount=self.ExpendingAccountDropdown.get()
 			RecipientAccount=self.RecipientAccountDropdown.get()
 			TransferAmount=self.TransferAmountField.get()
 			TransferDescription=self.TransferDescriptionField.get()
+			TransferDate=self.TransferDateField.get()
 			#if any of the values are empty then an error message will pop up and the core code will not execute
-			if ExpendingAccount == '' or RecipientAccount == '' or TransferAmount==self.TransferredMoney.isalpha()\
-			or TransferAmount=='' or TransferDescription=='' :
+			if ExpendingAccount == '' or RecipientAccount == '' or TransferAmount==TransferAmount.isalpha()\
+			or TransferAmount=='' or TransferDescription=='' or TransferDate=='':
 				# Create an error message variable
 				self.ErrorMessage = 'Error! Follow the directions and please try again.'
 				# Display the error message in an info dialog box.
 				tk.messagebox.showinfo('Error!', self.ErrorMessage)
 			else:
+				print('entered')
 				#Calls Account transfer function which will handle the database interactions for transferring money
-				FinanceProjectDatabaseAccess.AccountTransfer(ExpendingAccount, RecipientAccount,TransferAmount,TransferDescription)
+				FinanceProjectDatabaseAccess.AccountTransfer(ExpendingAccount, RecipientAccount,TransferAmount,TransferDescription,TransferDate)
 				# Repopulate treeviews with data
 				self.RepopulateAccountsTreeview()
 				self.RepopulateTransactionsTreeview()
-				#reformat labels back to original state
-				self.GiverAccountLabel.config(text='Giving Account:', foreground='black', background='white')
-				self.RecipientAccountLabel.config(text='Recipient Account:', foreground='black', background='white')
 				#clear amount transferred entry
-				self.AmountTransferredEntry.delete(0,END)
-		except:
-			# Create an error message variable
-			self.ErrorMessage ='Error! Follow the directions and please try again.'
-			# Display the error message in an info dialog box.
-			tk.messagebox.showinfo('Error!', self.ErrorMessage)
+				ExpendingAccount=self.ExpendingAccountDropdown.delete(0, END)
+				RecipientAccount=self.RecipientAccountDropdown.delete(0, END)
+				TransferAmount=self.TransferAmountField.delete(0, END)
+				TransferDescription=self.TransferDescriptionField.delete(0, END)
+				TransferDate=self.TransferDateField.delete(0, END)
+		# except:
+		# 	# Create an error message variable
+		# 	self.ErrorMessage ='Error! Follow the directions and please try again.'
+		# 	# Display the error message in an info dialog box.
+		# 	tk.messagebox.showinfo('Error!', self.ErrorMessage)
 	
 	
 	#gets the giving account for transferring money

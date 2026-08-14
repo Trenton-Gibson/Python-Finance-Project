@@ -311,7 +311,8 @@ with lite.connect(DIR_PATH) as conn:
 	
 	
 	#Handles all the database transactions for transferring money between accounts
-	def AccountTransfer(ExpendingAccount, RecipientAccount,TransferAmount,TransferDescription):
+	def AccountTransfer(ExpendingAccount, RecipientAccount,TransferAmount,TransferDescription,TransferDate):
+		print("arrived")
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
@@ -335,14 +336,23 @@ with lite.connect(DIR_PATH) as conn:
 		LogicalAccountID2=int()
 		RealAccountID1=int()
 		RealAccountID2=int()
+		RealAccountCurrentBalance1=0
+		RealAccountNewBalance1=0
+		RealAccountCurrentBalance2=0
+		RealAccountNewBalance2=0
+		LogicalAccountCurrentBalance1=0
+		LogicalAccountNewBalance1=0
+		LogicalAccountCurrentBalance2=0
+		LogicalAccountNewBalance2=0
+		print('before splitting')
 		if RealAccountCount==2:
 			# get all account ids and account balances for all the proceeding SQL for this function
 			ExpendingAccountID,ExpendingAccountCurrentBalance=GetAccountIDAndBalance(ExpendingAccount,"Real")
 			RecipientAccountID,RecipientAccountCurrentBalance=GetAccountIDAndBalance(RecipientAccount,"Real")
-			cur.execute('SELECT LogicalAccountID FROM Logical_Account WHERE LogicalAccountID>=0')
-			LogicalAccountID=cur.fetchall()
-			LogicalAccountID1=LogicalAccountID[0]
-			LogicalAccountID2=LogicalAccountID1
+			cur.execute('SELECT LogicalAccountID, Logical_Account_Balance FROM Logical_Account WHERE LogicalAccountID>=0')
+			LogicalAccountInfo=cur.fetchall()
+			LogicalAccountID1,LogicalAccountCurrentBalance1=LogicalAccountInfo[0]
+			LogicalAccountID2,LogicalAccountCurrentBalance2=LogicalAccountInfo[0]
 			RealAccountID1=ExpendingAccountID
 			RealAccountID2=RecipientAccountID
 			# update balances for real accounts
@@ -353,6 +363,11 @@ with lite.connect(DIR_PATH) as conn:
 			# Trigger an exception if the new balances would be negative
 			if ExpendingAccountNewBalance<0 or RecipientAccountNewBalance<0:
 				TriggerException=1/0
+			# set values for real account balances
+			RealAccountCurrentBalance1=ExpendingAccountCurrentBalance
+			RealAccountNewBalance1=ExpendingAccountNewBalance
+			RealAccountCurrentBalance2=RecipientAccountCurrentBalance
+			RealAccountNewBalance2=RecipientAccountNewBalance
 			#add the new balances for the accounts
 			cur.execute('''UPDATE Real_Account SET Real_Acount_Balance=? WHERE RealAccountID=? ''',(ExpendingAccountNewBalance,ExpendingAccountID))
 			cur.execute('''UPDATE Real_Account SET Real_Account_Balance=? WHERE RealAccountID=? ''',(RecipientAccountNewBalance,RecipientAccountID))
@@ -363,11 +378,11 @@ with lite.connect(DIR_PATH) as conn:
 			ExpendingAccountID,ExpendingAccountCurrentBalance=GetAccountIDAndBalance(ExpendingAccount,"Logical")
 			RecipientAccountID,RecipientAccountCurrentBalance=GetAccountIDAndBalance(RecipientAccount,"Logical")
 			cur.execute('SELECT RealAccountID FROM Real_Account WHERE RealAccountID>=0')
-			RecalAccountID=cur.fetchall()
+			RealAccountInfo=cur.fetchall()
 			LogicalAccountID1=ExpendingAccountID
 			LogicalAccountID2=ExpendingAccountID
-			RealAccountID1=RealAccountID[0]
-			RealAccountID2=RealAccountID1
+			RealAccountID1,RealAccountCurrentBalance1=RealAccountInfo[0]
+			RealAccountID2,RealAccountCurrentBalance2=RealAccountInfo[0]
 			# update balances for logical accounts
 			ExpendingAccountNewBalance=ExpendingAccountCurrentBalance-TransferAmount
 			ExpendingAccountNewBalance=round(ExpendingAccountNewBalance, 2)
@@ -376,6 +391,11 @@ with lite.connect(DIR_PATH) as conn:
 			# Trigger an exception if the new balances would be negative
 			if ExpendingAccountNewBalance<0 or RecipientAccountNewBalance<0:
 				TriggerException=1/0
+			# set values for real account balances
+			LogicalAccountCurrentBalance1=ExpendingAccountCurrentBalance
+			LogicalalAccountNewBalance1=ExpendingAccountNewBalance
+			LogicalAccountCurrentBalance2=RecipientAccountCurrentBalance
+			LogicalAccountNewBalance2=RecipientAccountNewBalance
 			#add the new balances for the accounts
 			cur.execute('''UPDATE Logical_Account SET Logical_Acount_Balance=? WHERE LogicalAccountID=? ''',(ExpendingAccountNewBalance,ExpendingAccountID))
 			cur.execute('''UPDATE Logical_Account SET Logical_Account_Balance=? WHERE LogicalAccountID=? ''',(RecipientAccountNewBalance,RecipientAccountID))
@@ -383,22 +403,23 @@ with lite.connect(DIR_PATH) as conn:
 			conn.commit()
 		else:
 			TriggerException=1/0
-
+		print('after splitting')
 		#Add transaction info into database
 		cur.execute('''INSERT INTO 'Transaction'(RealAccountID,LogicalAccountID,Date_Of_Transaction,Money_Transferred,
 		Real_Account_Previous_Balance, Real_Account_New_Balance,Logical_Account_Previous_Balance,Logical_Account_New_Balance,
-		Transaction_Type) VALUES(?,?,?,?,?,?,?,?,?)''' ,(RealAccountID1,LogicalAccountID1,TransactionDate,-TransferAmount,
-		RealAccountCurrentBalance,RealAccountNewBalance, LogicalAccountCurrentBalance,LogicalAccountNewBalance,TransactionDescription))
+		Transaction_Type) VALUES(?,?,?,?,?,?,?,?,?)''' ,(RealAccountID1,LogicalAccountID1,TransferDate,-TransferAmount,
+		RealAccountCurrentBalance1,RealAccountNewBalance1, LogicalAccountCurrentBalance1,LogicalAccountNewBalance1,TransferDescription))
 		#commit the data
 		conn.commit()
 		#Add transaction info into database
 		cur.execute('''INSERT INTO 'Transaction'(RealAccountID,LogicalAccountID,Date_Of_Transaction,Money_Transferred,
 		Real_Account_Previous_Balance, Real_Account_New_Balance,Logical_Account_Previous_Balance,Logical_Account_New_Balance,
-		Transaction_Type) VALUES(?,?,?,?,?,?,?,?,?)''' ,(RealAccountID2,LogicalAccountID2,TransactionDate,TransactionAmount,
-		RealAccountCurrentBalance,RealAccountNewBalance, LogicalAccountCurrentBalance,LogicalAccountNewBalance,TransactionDescription))
+		Transaction_Type) VALUES(?,?,?,?,?,?,?,?,?)''' ,(RealAccountID2,LogicalAccountID2,TransferDate,TransferAmount,
+		RealAccountCurrentBalance2,RealAccountNewBalance2, LogicalAccountCurrentBalance2,LogicalAccountNewBalance2,TransferDescription))
 		#commit the data
 		conn.commit()
 		conn.close()
+		print("completed")
 		
 	#Handles the transformation of account names on the database side
 	def RenamingAccount(ToBeChangedAccount,NewName,NewDescription):
