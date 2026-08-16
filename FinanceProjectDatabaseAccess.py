@@ -167,7 +167,6 @@ with lite.connect(DIR_PATH) as conn:
 			TransactionAmount = round(TransactionAmount, 2)
 			TransactionAmount = abs(TransactionAmount)
 			if ExpenditureType == BudgetExpenditureTypes.INCOME:
-				print(GetBudgetInfo(ChosenBudget))
 				BudgetAmount=float(GetBudgetInfo(ChosenBudget)[0][3])
 				# If the expenditure type is income and there is no
 				# chosen budget, then trigger an exception by dividing
@@ -312,7 +311,8 @@ with lite.connect(DIR_PATH) as conn:
 	
 	#Handles all the database transactions for transferring money between accounts
 	def AccountTransfer(ExpendingAccount, RecipientAccount,TransferAmount,TransferDescription,TransferDate):
-		print("arrived")
+		if ExpendingAccount==RecipientAccount:
+			TriggerException=1/0
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
@@ -322,13 +322,28 @@ with lite.connect(DIR_PATH) as conn:
 		#Check to make sure both accounts are logical or real and not mixed
 		ExpendingAccountID=int()
 		RecipientAccountID=int()
-		cur.execute('''SELECT RealAccountID FROM Real_Account WHERE Real_Account_Type=? AND Real_Account_Type=?''',(ExpendingAccount, RecipientAccount))
-		RealAccountIDs=cur.fetchall()
+		TupleTest=''
+		RealAccountIDs=[]
+		cur.execute('''SELECT RealAccountID FROM Real_Account WHERE Real_Account_Type=?''',(ExpendingAccount,))
+		TupleTest=cur.fetchall()
+		if TupleTest:
+			RealAccountIDs.append(TupleTest[0])
+		cur.execute('''SELECT RealAccountID FROM Real_Account WHERE Real_Account_Type=?''',(RecipientAccount,))
+		TupleTest=cur.fetchall()
+		if TupleTest:
+			RealAccountIDs.append(TupleTest[0])
 		RealAccountCount=0
 		for item in RealAccountIDs:
 			RealAccountCount+=1
-		cur.execute('''SELECT LogicalAccountID FROM Logical_Account WHERE Logical_Account_Type=? AND Logical_Account_Type=?''',(ExpendingAccount, RecipientAccount))
-		LogicalAccountIDs=cur.fetchall()
+		LogicalAccountIDs=[]
+		cur.execute('''SELECT LogicalAccountID FROM Logical_Account WHERE Logical_Account_Type=?''',(ExpendingAccount,))
+		TupleTest=cur.fetchall()
+		if TupleTest:
+			LogicalAccountIDs.append(TupleTest[0])
+		cur.execute('''SELECT LogicalAccountID FROM Logical_Account WHERE Logical_Account_Type=?''',(RecipientAccount,))
+		TupleTest=cur.fetchall()
+		if TupleTest:
+			LogicalAccountIDs.append(TupleTest[0])
 		LogicalAccountCount=0
 		for item in LogicalAccountIDs:
 			LogicalAccountCount+=1
@@ -344,7 +359,6 @@ with lite.connect(DIR_PATH) as conn:
 		LogicalAccountNewBalance1=0
 		LogicalAccountCurrentBalance2=0
 		LogicalAccountNewBalance2=0
-		print('before splitting')
 		if RealAccountCount==2:
 			# get all account ids and account balances for all the proceeding SQL for this function
 			ExpendingAccountID,ExpendingAccountCurrentBalance=GetAccountIDAndBalance(ExpendingAccount,"Real")
@@ -369,7 +383,7 @@ with lite.connect(DIR_PATH) as conn:
 			RealAccountCurrentBalance2=RecipientAccountCurrentBalance
 			RealAccountNewBalance2=RecipientAccountNewBalance
 			#add the new balances for the accounts
-			cur.execute('''UPDATE Real_Account SET Real_Acount_Balance=? WHERE RealAccountID=? ''',(ExpendingAccountNewBalance,ExpendingAccountID))
+			cur.execute('''UPDATE Real_Account SET Real_Account_Balance=? WHERE RealAccountID=? ''',(ExpendingAccountNewBalance,ExpendingAccountID))
 			cur.execute('''UPDATE Real_Account SET Real_Account_Balance=? WHERE RealAccountID=? ''',(RecipientAccountNewBalance,RecipientAccountID))
 			#commit the data
 			conn.commit()
@@ -377,7 +391,7 @@ with lite.connect(DIR_PATH) as conn:
 			# get all account ids and account balances for all the proceeding SQL for this function
 			ExpendingAccountID,ExpendingAccountCurrentBalance=GetAccountIDAndBalance(ExpendingAccount,"Logical")
 			RecipientAccountID,RecipientAccountCurrentBalance=GetAccountIDAndBalance(RecipientAccount,"Logical")
-			cur.execute('SELECT RealAccountID FROM Real_Account WHERE RealAccountID>=0')
+			cur.execute('SELECT RealAccountID, Real_Account_Balance FROM Real_Account WHERE RealAccountID>=0')
 			RealAccountInfo=cur.fetchall()
 			LogicalAccountID1=ExpendingAccountID
 			LogicalAccountID2=ExpendingAccountID
@@ -397,13 +411,12 @@ with lite.connect(DIR_PATH) as conn:
 			LogicalAccountCurrentBalance2=RecipientAccountCurrentBalance
 			LogicalAccountNewBalance2=RecipientAccountNewBalance
 			#add the new balances for the accounts
-			cur.execute('''UPDATE Logical_Account SET Logical_Acount_Balance=? WHERE LogicalAccountID=? ''',(ExpendingAccountNewBalance,ExpendingAccountID))
+			cur.execute('''UPDATE Logical_Account SET Logical_Account_Balance=? WHERE LogicalAccountID=? ''',(ExpendingAccountNewBalance,ExpendingAccountID))
 			cur.execute('''UPDATE Logical_Account SET Logical_Account_Balance=? WHERE LogicalAccountID=? ''',(RecipientAccountNewBalance,RecipientAccountID))
 			#commit the data
 			conn.commit()
 		else:
 			TriggerException=1/0
-		print('after splitting')
 		#Add transaction info into database
 		cur.execute('''INSERT INTO 'Transaction'(RealAccountID,LogicalAccountID,Date_Of_Transaction,Money_Transferred,
 		Real_Account_Previous_Balance, Real_Account_New_Balance,Logical_Account_Previous_Balance,Logical_Account_New_Balance,
@@ -419,7 +432,6 @@ with lite.connect(DIR_PATH) as conn:
 		#commit the data
 		conn.commit()
 		conn.close()
-		print("completed")
 		
 	#Handles the transformation of account names on the database side
 	def RenamingAccount(ToBeChangedAccount,NewName,NewDescription):

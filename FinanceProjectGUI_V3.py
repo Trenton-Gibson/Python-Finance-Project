@@ -528,8 +528,7 @@ class FinanceGUI:
 			
 	#Handles transferring money between two accounts
 	def TransferringMoney(self):
-		# try:
-			print("working?")
+		try:
 			#get accounts transferring and amount of money being transferred
 			ExpendingAccount=self.ExpendingAccountDropdown.get()
 			RecipientAccount=self.RecipientAccountDropdown.get()
@@ -544,7 +543,6 @@ class FinanceGUI:
 				# Display the error message in an info dialog box.
 				tk.messagebox.showinfo('Error!', self.ErrorMessage)
 			else:
-				print('entered')
 				#Calls Account transfer function which will handle the database interactions for transferring money
 				FinanceProjectDatabaseAccess.AccountTransfer(ExpendingAccount, RecipientAccount,TransferAmount,TransferDescription,TransferDate)
 				# Repopulate treeviews with data
@@ -556,11 +554,11 @@ class FinanceGUI:
 				TransferAmount=self.TransferAmountField.delete(0, END)
 				TransferDescription=self.TransferDescriptionField.delete(0, END)
 				TransferDate=self.TransferDateField.delete(0, END)
-		# except:
-		# 	# Create an error message variable
-		# 	self.ErrorMessage ='Error! Follow the directions and please try again.'
-		# 	# Display the error message in an info dialog box.
-		# 	tk.messagebox.showinfo('Error!', self.ErrorMessage)
+		except:
+			# Create an error message variable
+			self.ErrorMessage ='Error! Follow the directions and please try again.'
+			# Display the error message in an info dialog box.
+			tk.messagebox.showinfo('Error!', self.ErrorMessage)
 	
 	
 	#gets the giving account for transferring money
