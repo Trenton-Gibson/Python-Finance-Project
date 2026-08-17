@@ -294,10 +294,12 @@ class FinanceGUI:
 		## Create transaction history frame widgets
 		self.TransactionHistoryLabel = tk.Label(self.TransactionHistoryFrame, text='Transaction History')
 		self.AccountChoiceLabel = tk.Label(self.TransactionHistoryFrame, text='Account Choice')
-		self.AccountChoiceDropdown=ttk.Combobox(self.TransactionHistoryFrame)
+		self.AccountHistoryDropdownChoice = tk.StringVar()
+		self.AccountChoiceDropdown=ttk.Combobox(self.TransactionHistoryFrame, textvariable=self.AccountHistoryDropdownChoice)
+		self.AccountChoiceDropdown.bind("<<ComboboxSelected>>", self.AddTransactionHistoryAccount)
 		self.ChosenAccountsLabel=tk.Label(self.TransactionHistoryFrame, text='Chosen Accounts')
 		self.ChosenAccountsField=tk.Entry(self.TransactionHistoryFrame)
-		self.ShowHistoryButton=tk.Button(self.TransactionHistoryFrame, text='Show History')
+		self.ShowHistoryButton=tk.Button(self.TransactionHistoryFrame, text='Show History', command=self.AccountHistory)
 		##Pack Transaction history frame widgets
 		self.TransactionHistoryLabel.grid(row=0, column=0, columnspan=2)
 		self.AccountChoiceLabel.grid(row=1, column=0)
@@ -377,7 +379,6 @@ class FinanceGUI:
 		##Configure the Transaction Treeview Scrollbar
 		self.Transaction_yscroll.config(command=self.TransHisTransactionInfo.yview)
 		##Populate the Transaction Treeview with data
-		self.StartAccountHistory = ''
 		self.RepopulateTransactionsTreeview()
 		# Change the style of the Treeviews
 		style = ttk.Style()
@@ -434,6 +435,7 @@ class FinanceGUI:
 			self.ErrorMessage ='Error! Follow the directions and please try again.'
 			#Display the error message in an info dialog box.
 			tk.messagebox.showinfo('Error!', self.ErrorMessage)
+
 			
 	#Creates a new account
 	def AddAccount(self):
@@ -489,41 +491,41 @@ class FinanceGUI:
 	
 	#Gets the account transaction history of a specific account
 	def AccountHistory(self):
-		try:
+		# try:
 			#get the selected account name from the accounts treeview
-			self.selected = self.AccountsInfoTreeview.focus()
-			self.AccountHistory = self.AccountsInfoTreeview.item(self.selected, 'values')
-			#isolate the account name from the rest of the data
-			# start accumulator to act as a trigger to end the loop early so the needed value can be obtained
-			count = 0
-			# process tuple data into string data
-			for item in self.AccountHistory:
-				count += 1
-				String = str(item)
-				self.AccountHistory = String
-				# end the loop when the correct value is in play
-				if count == 1:
-					break
+			AccountHistory = self.ChosenAccountsField.get()
+			# #isolate the account name from the rest of the data
+			# # start accumulator to act as a trigger to end the loop early so the needed value can be obtained
+			# count = 0
+			# # process tuple data into string data
+			# for item in self.AccountHistory:
+			# 	count += 1
+			# 	String = str(item)
+			# 	self.AccountHistory = String
+			# 	# end the loop when the correct value is in play
+			# 	if count == 1:
+			# 		break
 			#if there is no account clicked the table is restored
-			if self.AccountHistory!='':
+			if AccountHistory!='':
 				# call the Account transaction History function to retrieve data from the database to view
-				self.TransactionAccountHistory = FinanceProjectDatabaseAccess.AccountTransactionHistory(
-					self.AccountHistory)
+				TransactionAccountHistory = FinanceProjectDatabaseAccess.AccountTransactionHistory(AccountHistory)
 				# clear the data out and replace it with the requested data
 				for item in self.TransHisTransactionInfo.get_children():
 					self.TransHisTransactionInfo.delete(item)
-				for row in self.TransactionAccountHistory:
-					self.TransHisTransactionInfo.insert("", tk.END, values=row)
+				for row in TransactionAccountHistory:
+					TransactionType,TransactionDate,TransactionAmount,\
+					RealAccountName, RealPreviousBalance, RealCurrentBalance,\
+					LogicalAccountName, LogicalPreviousBalance, LogicalCurrentBalance=row
+					TransactionRow=self.TransHisTransactionInfo.insert("", tk.END, values=(TransactionType,TransactionDate,TransactionAmount,"","","",""))
+					self.TransHisTransactionInfo.insert(TransactionRow, tk.END, values=("","","","Real",RealAccountName,RealPreviousBalance,RealCurrentBalance))
+					self.TransHisTransactionInfo.insert(TransactionRow, tk.END, values=("","","","Logical",LogicalAccountName,LogicalPreviousBalance,LogicalCurrentBalance))
 			else:
-				# Create an error message variable
-				self.ErrorMessage = 'Error! Follow the directions and please try again.'
-				# Display the error message in an info dialog box.
-				tk.messagebox.showinfo('Error!', self.ErrorMessage)
-		except:
-			# Create an error message variable
-			self.ErrorMessage ='Error! Follow the directions and please try again.'
-			# Display the error message in an info dialog box.
-			tk.messagebox.showinfo('Error!', self.ErrorMessage)
+				self.RepopulateTransactionsTreeview()
+		# except:
+		# 	# Create an error message variable
+		# 	self.ErrorMessage ='Error! Follow the directions and please try again.'
+		# 	# Display the error message in an info dialog box.
+		# 	tk.messagebox.showinfo('Error!', self.ErrorMessage)
 			
 			
 	#Handles transferring money between two accounts
@@ -635,7 +637,7 @@ class FinanceGUI:
 	#Repopulate the transaction treeview with data
 	def RepopulateTransactionsTreeview(self):
 		#get the transaction history for all the accounts
-		TransactionAccountHistory = FinanceProjectDatabaseAccess.AccountTransactionHistory(self.StartAccountHistory)
+		TransactionAccountHistory = FinanceProjectDatabaseAccess.AccountTransactionHistory('')
 		#clear the transaction treeview
 		for item in self.TransHisTransactionInfo.get_children():	
 			self.TransHisTransactionInfo.delete(item)
@@ -849,6 +851,16 @@ class FinanceGUI:
 		FinanceProjectDatabaseAccess.DeleteBudgetItem(BudgetItemID)
 		self.ResetBudgetTree("event")
 		self.ResetBudgetStats()
+
+
+	def AddTransactionHistoryAccount(self, event):
+		NewAccountChoice=self.AccountChoiceDropdown.get()
+		ChosenAccounts=self.ChosenAccountsField.get()
+		if ChosenAccounts=='':
+			self.ChosenAccountsField.insert(END, NewAccountChoice)
+		else:
+			NewAccountChoice=","+NewAccountChoice
+			self.ChosenAccountsField.insert(END, NewAccountChoice)
 
 
 # Call the Finance GUI Class

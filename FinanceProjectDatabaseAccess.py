@@ -289,6 +289,7 @@ with lite.connect(DIR_PATH) as conn:
 		# connect to the database and make a cursor
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
+		AccountTransactionHistory=[]
 		# get the transaction history of all accounts if the argument some version of 'All'
 		if AccountHistory == '':
 			cur.execute('''SELECT 'Transaction'.Transaction_Type,'Transaction'.Date_Of_Transaction,'Transaction'.Money_Transferred,
@@ -296,15 +297,41 @@ with lite.connect(DIR_PATH) as conn:
 			Logical_Account.Logical_Account_Type,'Transaction'.Logical_Account_Previous_Balance,'Transaction'.Logical_Account_New_Balance
 			FROM Real_Account INNER JOIN 'Transaction' ON Real_Account.RealAccountID= 'Transaction'.RealAccountID INNER JOIN Logical_Account
 			ON Logical_Account.LogicalAccountID = 'Transaction'.LogicalAccountID''')
+			AccountTransactionHistory=cur.fetchall()
 		#get transaction history of account specified by argument
 		else:
-			cur.execute("SELECT Real_Account.Real_Account_Type,'Transaction'.Real_Account_Previous_Balance,'Transaction'.Real_Account_New_Balance,"
-			"'Transaction'.Transaction_Type,'Transaction'.Money_Transferred,'Transaction'.Date_Of_Transaction "
-			"FROM Real_Account INNER JOIN 'Transaction' ON Real_Account.RealAccountID= 'Transaction'.RealAccountID WHERE Real_Account_Type=?",
-			(AccountHistory,))
-		# get data from executed SELECT statement,
+			AccountHistory=AccountHistory.split(",")
+			RealAccounts=[]
+			LogicalAccounts=[]
+			for account in AccountHistory:
+				cur.execute("SELECT Real_Account_Type FROM Real_Account WHERE Real_Account_Type=?",(account,))
+				test=cur.fetchall()
+				if test:
+					RealAccounts.append(account)
+				else:
+					LogicalAccounts.append(account)
+			if RealAccounts:
+				for account in RealAccounts:
+					cur.execute('''SELECT 'Transaction'.Transaction_Type,'Transaction'.Date_Of_Transaction,'Transaction'.Money_Transferred,
+					Real_Account.Real_Account_Type,'Transaction'.Real_Account_Previous_Balance,'Transaction'.Real_Account_New_Balance,
+					Logical_Account.Logical_Account_Type,'Transaction'.Logical_Account_Previous_Balance,'Transaction'.Logical_Account_New_Balance
+					FROM Real_Account INNER JOIN 'Transaction' ON Real_Account.RealAccountID= 'Transaction'.RealAccountID INNER JOIN Logical_Account
+					ON Logical_Account.LogicalAccountID = 'Transaction'.LogicalAccountID WHERE Real_Account_Type=?''', (account,))
+					Transactions=cur.fetchall()
+					for transaction in Transactions:
+						AccountTransactionHistory.append(transaction)
+			if LogicalAccounts:
+				for account in LogicalAccounts:
+					cur.execute('''SELECT 'Transaction'.Transaction_Type,'Transaction'.Date_Of_Transaction,'Transaction'.Money_Transferred,
+					Real_Account.Real_Account_Type,'Transaction'.Real_Account_Previous_Balance,'Transaction'.Real_Account_New_Balance,
+					Logical_Account.Logical_Account_Type,'Transaction'.Logical_Account_Previous_Balance,'Transaction'.Logical_Account_New_Balance
+					FROM Real_Account INNER JOIN 'Transaction' ON Real_Account.RealAccountID= 'Transaction'.RealAccountID INNER JOIN Logical_Account
+					ON Logical_Account.LogicalAccountID = 'Transaction'.LogicalAccountID WHERE Logical_Account_Type=?''', (account,))
+					Transactions=cur.fetchall()
+					for transaction in Transactions:
+						AccountTransactionHistory.append(transaction)
+
 		# close the database, return the account transaction history
-		AccountTransactionHistory=cur.fetchall()
 		conn.close()
 		return AccountTransactionHistory
 	
