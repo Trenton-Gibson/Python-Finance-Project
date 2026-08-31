@@ -1,13 +1,19 @@
 ## New Features
-Deleting Budgets
 Editing Budgets
 Editing Budget Items
+Need to add error trapping
+Need to improve documentation
+Make Transfer Date have separate fields
+have place to show budget description
+show budget allocation amounts in transactions if applicable
 ## Bug Fixes
+Make sure that the fixed parts of income and percentage parts of income can be
+paid to the logical accounts without exceeding the income amount
 
+Have it so no future dates can be recorded
 
 ## Question To Consider
 Should budgets have fixed amounts?
-Need to add error trapping 
-
+Should I change the way transactions are handled to deal with transfer better?
+Is it worth improving the UI?
 ## Features to Still Implement
-Transaction Entry

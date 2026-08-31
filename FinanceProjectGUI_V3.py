@@ -58,6 +58,7 @@ class FinanceGUI:
 		self.TransactionTreeviewFrame =ttk.Frame(self.TrueMiddleFrame)
 		##Child frames of Budgeting Frame
 		self.CreateBudgetFrame=ttk.Frame(self.BudgetingFrame)
+		self.DeleteBudgetFrame=ttk.Frame(self.BudgetingFrame)
 		self.EditBudgetFrame=ttk.Frame(self.BudgetingFrame)
 		
 		#pack parent frames
@@ -77,7 +78,8 @@ class FinanceGUI:
 		self.TransactionTreeviewFrame.grid(row=0, column=1)
 		##Frames of Budgeting Frame
 		self.CreateBudgetFrame.grid(row=0, column=0,sticky="ew")
-		self.EditBudgetFrame.grid(row=1, column=0, sticky="ew")
+		self.DeleteBudgetFrame.grid(row=0, column=1,sticky="ew")
+		self.EditBudgetFrame.grid(row=1, column=0, columnspan=2)
 		
 		# Create Widgets for Personal Finance Manager Window
 		#Create UI for Budgeting Page
@@ -99,6 +101,16 @@ class FinanceGUI:
 		self.BudgetDescriptionLabel.grid(row=0, column=3)
 		self.BudgetDescriptionField.grid(row=1, column=3)
 		self.CreateBudgetButton.grid(row=1, column=4)
+		## Create Widget for Delete Budget Frame
+		self.BudgetDeletionLabel=tk.Label(self.DeleteBudgetFrame, text="Budget Deletion")
+		self.BudgetToDeleteLabel=tk.Label(self.DeleteBudgetFrame, text="Budget to Delete")
+		self.BudgetToDeleteDropdown=ttk.Combobox(self.DeleteBudgetFrame)
+		self.DeleteBudgetButton=tk.Button(self.DeleteBudgetFrame, text="Delete Budget", command=self.DeleteBudget)
+		## Add Widgets for Delete Budget Frame
+		self.BudgetDeletionLabel.grid(row=1, column=0)
+		self.BudgetToDeleteLabel.grid(row=0, column=1)
+		self.BudgetToDeleteDropdown.grid(row=1, column=1)
+		self.DeleteBudgetButton.grid(row=1, column=2)
 		## Create Widgets for Edit Budget Frame
 		self.BudgetEditingAndViewingLabel=tk.Label(self.EditBudgetFrame, text="Budget Editing and Viewing")
 		self.BudgetEditingDropdownLabel=tk.Label(self.EditBudgetFrame, text="Budget to Edit or View")
@@ -232,7 +244,11 @@ class FinanceGUI:
 		self.IncomeOrExpenseLabel=tk.Label(self.HandleAccountFrame, text='Income or Expense')
 		self.IncomeOrExpenseDropdown=ttk.Combobox(self.HandleAccountFrame,values=['Income','Expense'])
 		self.BudgetLabel=tk.Label(self.HandleAccountFrame, text='Budget (If Income)')
+		self.AccountHistoryDropdownChoice = tk.StringVar()
+		self.AccountChoiceDropdown=ttk.Combobox(self.TransactionHistoryFrame, textvariable=self.AccountHistoryDropdownChoice)
+		self.AccountChoiceDropdown.bind("<<ComboboxSelected>>", self.AddTransactionHistoryAccount)
 		self.BudgetDropdown=ttk.Combobox(self.HandleAccountFrame)
+		self.BudgetAmountLabel=tk.Label(self.HandleAccountFrame, text="Budget Amount:")
 		self.TransactionAmountLabel=tk.Label(self.HandleAccountFrame, text='Transaction Amount')
 		self.TransactionAmountField=tk.Entry(self.HandleAccountFrame)
 		self.DateofTransLabel = tk.Label(self.HandleAccountFrame, text='Transaction Date')
@@ -254,6 +270,7 @@ class FinanceGUI:
 		self.IncomeOrExpenseDropdown.grid(row=3, column=1, columnspan=5)
 		self.BudgetLabel.grid(row=4, column=0)
 		self.BudgetDropdown.grid(row=4, column=1, columnspan=5)
+		self.BudgetAmountLabel.grid(row=4, column=5)
 		self.TransactionAmountLabel.grid(row=5, column=0)
 		self.TransactionAmountField.grid(row=5, column=1, columnspan=5)
 		self.DateofTransLabel.grid(row=6, column=0)
@@ -395,7 +412,7 @@ class FinanceGUI:
 	# Additional Methods
 	#Handles Typical transactions.Is called by Handle Account Frame Widgets.
 	def TransDataAndTransCommit(self):
-		try:
+		# try:
 			# Get data for Transaction
 			RealAccount=self.RealAccountDropdown.get()
 			LogicalAccount=self.LogicalAccountDropdown.get()
@@ -430,11 +447,11 @@ class FinanceGUI:
 				self.DayofTransEntry.delete(0,END)
 				self.YearofTransEntry.delete(0,END)
 				TransactionDescription=self.TransactionTypeEntry.delete(0,END)
-		except:
-			#Create an error message variable
-			self.ErrorMessage ='Error! Follow the directions and please try again.'
-			#Display the error message in an info dialog box.
-			tk.messagebox.showinfo('Error!', self.ErrorMessage)
+		# except:
+		# 	#Create an error message variable
+		# 	self.ErrorMessage ='Error! Follow the directions and please try again.'
+		# 	#Display the error message in an info dialog box.
+		# 	tk.messagebox.showinfo('Error!', self.ErrorMessage)
 
 			
 	#Creates a new account
@@ -763,7 +780,7 @@ class FinanceGUI:
 		self.BudgetNameField.delete(0, END)
 		self.BudgetDescriptionField.delete(0, END)
 		self.BudgetAmountField.delete(0, END)
-		self.RepopulateBudgetDropbox()
+		self.RepopulateBudgetDropboxes()
 
 
 	def RepopulateBudgetDropboxes(self):
@@ -773,6 +790,7 @@ class FinanceGUI:
 			NamesList.append(name[0])
 		self.BudgetEditingDropdown['values'] = NamesList
 		self.BudgetDropdown['values'] = NamesList
+		self.BudgetToDeleteDropdown['values'] = NamesList
 
 
 	def ResetBudgetTree(self,event):
@@ -812,29 +830,32 @@ class FinanceGUI:
 		# Get the current budget in use from the dropdown
 		# for choosing a budget.
 		BudgetName=self.BudgetEditingDropdown.get()
-		# Get a list from the database module that contains all the
-		# data for a row in the Budget table.
-		BudgetStats=FinanceProjectDatabaseAccess.GetBudgetInfo(BudgetName)
-		BudgetAmount=BudgetStats[0]
-		BudgetAmount=float(BudgetAmount[3])
-		BudgetItems=FinanceProjectDatabaseAccess.GetBudgetItems(BudgetName)
-		AllocatedFunds=float()
-		FundsInRemainder=float()
-		RemainderItems=[]
-		for row in BudgetItems:
-			AllocationType=row[3]
-			if AllocationType==BudgetAllocationTypes.PERCENTAGE:
-				AllocatedFunds+=(float(row[4])/100*BudgetAmount)
-			elif AllocationType==BudgetAllocationTypes.REMAINDER:
-				RemainderItems.append(row)
-			elif AllocationType==BudgetAllocationTypes.FIXED:
-				AllocatedFunds+=float(row[4])
-		if RemainderItems:
-			FundsInRemainder+=BudgetAmount-AllocatedFunds
-		if BudgetAmount > 0:
-			self.BudgetStatsLabel['text']=f"Total Budget Allocation:${round(BudgetAmount,2)}      Unallocated Funds:${round(BudgetAmount-AllocatedFunds-FundsInRemainder, 2)}           Percentage of Funds Unallocated:{round(((BudgetAmount-AllocatedFunds-FundsInRemainder)/BudgetAmount)*100, 2)}%        Funds Allocated to the Remainder:${round(FundsInRemainder, 2)}/{len(RemainderItems)}"
+		if BudgetName=='':
+			pass
 		else:
-			messagebox.showerror("Divison by Zero!", "Can't show the stats of a budget with no allocated funds!")
+			# Get a list from the database module that contains all the
+			# data for a row in the Budget table.
+			BudgetStats=FinanceProjectDatabaseAccess.GetBudgetInfo(BudgetName)
+			BudgetAmount=BudgetStats[0]
+			BudgetAmount=float(BudgetAmount[3])
+			BudgetItems=FinanceProjectDatabaseAccess.GetBudgetItems(BudgetName)
+			AllocatedFunds=float()
+			FundsInRemainder=float()
+			RemainderItems=[]
+			for row in BudgetItems:
+				AllocationType=row[3]
+				if AllocationType==BudgetAllocationTypes.PERCENTAGE:
+					AllocatedFunds+=(float(row[4])/100*BudgetAmount)
+				elif AllocationType==BudgetAllocationTypes.REMAINDER:
+					RemainderItems.append(row)
+				elif AllocationType==BudgetAllocationTypes.FIXED:
+					AllocatedFunds+=float(row[4])
+			if RemainderItems:
+				FundsInRemainder+=BudgetAmount-AllocatedFunds
+			if BudgetAmount > 0:
+				self.BudgetStatsLabel['text']=f"Total Budget Allocation:${round(BudgetAmount,2)}      Unallocated Funds:${round(BudgetAmount-AllocatedFunds-FundsInRemainder, 2)}           Percentage of Funds Unallocated:{round(((BudgetAmount-AllocatedFunds-FundsInRemainder)/BudgetAmount)*100, 2)}%        Funds Allocated to the Remainder:${round(FundsInRemainder, 2)}/{len(RemainderItems)}"
+			else:
+				messagebox.showerror("Divison by Zero!", "Can't show the stats of a budget with no allocated funds!")
 
 
 	def DeleteBudgetItem(self):
@@ -862,6 +883,12 @@ class FinanceGUI:
 			NewAccountChoice=","+NewAccountChoice
 			self.ChosenAccountsField.insert(END, NewAccountChoice)
 
+
+	def DeleteBudget(self):
+		BudgetToDelete=self.BudgetToDeleteDropdown.get()
+		FinanceProjectDatabaseAccess.DeleteBudget(BudgetToDelete)
+		self.RepopulateBudgetDropboxes()
+		self.ResetBudgetTree('event')
 
 # Call the Finance GUI Class
 if __name__ == '__main__':

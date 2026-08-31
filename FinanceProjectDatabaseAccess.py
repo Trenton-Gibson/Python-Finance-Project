@@ -197,19 +197,23 @@ with lite.connect(DIR_PATH) as conn:
 				BudgetAllocationType=item[3]
 				if BudgetAllocationType==BudgetAllocationTypes.REMAINDER:
 					RemainderItemCount+=1
+			TotalAmountAllocated=0	
 			for item in BudgetItems:
 				LogicalAccountName=item[2]
 				LogicalAccountID,LogicalAccountCurrentBalance=GetAccountIDAndBalance(LogicalAccountName,"Logical")
 				BudgetAllocationType=item[3]
 				BudgetAllocationAmount=float(item[4])
 				if BudgetAllocationType==BudgetAllocationTypes.FIXED:
+					TotalAmountAllocated+=BudgetAllocationAmount
+					TotalAmountAllocated=round(TotalAmountAllocated,2)
 					LogicalAccountNewBalance=LogicalAccountCurrentBalance+BudgetAllocationAmount
 					LogicalAccountNewBalance=round(LogicalAccountNewBalance,2)
 				elif BudgetAllocationType==BudgetAllocationTypes.PERCENTAGE:
+					TotalAmountAllocated+=(float(BudgetAllocationAmount)/100*TransactionAmount)
 					LogicalAccountNewBalance=LogicalAccountCurrentBalance+(float(BudgetAllocationAmount)/100*TransactionAmount)
 					LogicalAccountNewBalance=round(LogicalAccountNewBalance,2)
 				elif BudgetAllocationType==BudgetAllocationTypes.REMAINDER:
-					LogicalAccountNewBalance=LogicalAccountCurrentBalance+((BudgetAllocationAmount)/RemainderItemCount)
+					LogicalAccountNewBalance=LogicalAccountCurrentBalance+(abs(TransactionAmount-TotalAmountAllocated)/RemainderItemCount)
 					LogicalAccountNewBalance=round(LogicalAccountNewBalance,2)
 				#Add transaction info into database
 				cur.execute('''INSERT INTO 'Transaction'(RealAccountID,LogicalAccountID,Date_Of_Transaction,Money_Transferred,
@@ -240,7 +244,7 @@ with lite.connect(DIR_PATH) as conn:
 			#commit the data
 			conn.commit()
 			#add the new balances for the accounts
-			cur.execute('''UPDATE Real_Account SET Real_Acount_Balance=? WHERE RealAccountID=? ''',(RealAccountNewBalance,RealAccountID))
+			cur.execute('''UPDATE Real_Account SET Real_Account_Balance=? WHERE RealAccountID=? ''',(RealAccountNewBalance,RealAccountID))
 			cur.execute('''UPDATE Logical_Account SET Logical_Account_Balance=? WHERE LogicalAccountID=? ''',(LogicalAccountNewBalance,LogicalAccountID))
 			#commit the data
 			conn.commit()
@@ -649,6 +653,15 @@ with lite.connect(DIR_PATH) as conn:
 		conn = lite.connect(DIR_PATH)
 		cur = conn.cursor()
 		cur.execute('''DELETE FROM Budget_Item WHERE BudgetItemID=?''',(BudgetItemID,))
+		conn.commit()
+		conn.close()
+
+
+	def DeleteBudget(BudgetName):
+		# connect to the database and make a cursor
+		conn = lite.connect(DIR_PATH)
+		cur = conn.cursor()
+		cur.execute('''DELETE FROM Budget WHERE Budget_Name=?''',(BudgetName,))
 		conn.commit()
 		conn.close()
 
