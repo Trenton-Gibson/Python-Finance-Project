@@ -244,10 +244,9 @@ class FinanceGUI:
 		self.IncomeOrExpenseLabel=tk.Label(self.HandleAccountFrame, text='Income or Expense')
 		self.IncomeOrExpenseDropdown=ttk.Combobox(self.HandleAccountFrame,values=['Income','Expense'])
 		self.BudgetLabel=tk.Label(self.HandleAccountFrame, text='Budget (If Income)')
-		self.AccountHistoryDropdownChoice = tk.StringVar()
-		self.AccountChoiceDropdown=ttk.Combobox(self.TransactionHistoryFrame, textvariable=self.AccountHistoryDropdownChoice)
-		self.AccountChoiceDropdown.bind("<<ComboboxSelected>>", self.AddTransactionHistoryAccount)
-		self.BudgetDropdown=ttk.Combobox(self.HandleAccountFrame)
+		self.IncomeBudgetDropdownChoice = tk.StringVar()
+		self.BudgetDropdown=ttk.Combobox(self.HandleAccountFrame,textvariable=self.IncomeBudgetDropdownChoice)
+		self.BudgetDropdown.bind("<<ComboboxSelected>>", self.ShowBudgetAllocationAmount)
 		self.BudgetAmountLabel=tk.Label(self.HandleAccountFrame, text="Budget Amount:")
 		self.TransactionAmountLabel=tk.Label(self.HandleAccountFrame, text='Transaction Amount')
 		self.TransactionAmountField=tk.Entry(self.HandleAccountFrame)
@@ -889,6 +888,13 @@ class FinanceGUI:
 		FinanceProjectDatabaseAccess.DeleteBudget(BudgetToDelete)
 		self.RepopulateBudgetDropboxes()
 		self.ResetBudgetTree('event')
+
+
+	def ShowBudgetAllocationAmount(self,event):
+		BudgetChoice=self.IncomeBudgetDropdownChoice.get()
+		BudgetData=FinanceProjectDatabaseAccess.GetBudgetInfo(BudgetChoice)
+		BudgetAmount=BudgetData[0][3]
+		self.BudgetAmountLabel.config(text="Budget Amount: "+BudgetAmount)
 
 # Call the Finance GUI Class
 if __name__ == '__main__':

@@ -5,7 +5,7 @@ Need to add error trapping
 Need to improve documentation
 Make Transfer Date have separate fields
 have place to show budget description
-show budget allocation amounts in transactions if applicable
+Hide budget amount label in account management when not applicable
 ## Bug Fixes
 Make sure that the fixed parts of income and percentage parts of income can be
 paid to the logical accounts without exceeding the income amount
