@@ -11,9 +11,9 @@ Make sure that the fixed parts of income and percentage parts of income can be
 paid to the logical accounts without exceeding the income amount
 
 Have it so no future dates can be recorded
-
 ## Question To Consider
 Should budgets have fixed amounts?
 Should I change the way transactions are handled to deal with transfer better?
 Is it worth improving the UI?
+Should there be an option to do individual income distribution similar to the old system?
 ## Features to Still Implement

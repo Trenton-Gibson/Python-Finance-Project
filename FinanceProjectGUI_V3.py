@@ -13,6 +13,8 @@ from tkinter import ttk
 from tkinter import messagebox
 from enum import StrEnum
 import FinanceProjectDatabaseAccess
+import sqlite3 as lite
+import os
 class BudgetAllocationTypes(StrEnum):
 	PERCENTAGE="Percentage"
 	FIXED="Fixed"
@@ -29,6 +31,21 @@ class AccountTypes(StrEnum):
 # Create Finance GUI class
 class FinanceGUI:
 	def __init__(self):
+		db_path = "PythonFinances.db"
+		if not os.path.isfile(db_path):
+			# Creates 'my_database.db' if it doesn't exist
+			conn = lite.connect('PythonFinances.db')
+			cursor = conn.cursor()
+			# Read and execute the SQL schema file
+			with open('Database Generation Script.sql', 'r') as f:
+				sql_script = f.read()
+				cursor.executescript(sql_script)
+			conn.commit()
+			# Close the connection when done
+			conn.close()
+			print("done")
+		else:
+			print("yeet")
 		# Create Personal Finance Manager window, maximize the window, and create universal styles
 		self.PersonalFinanceManager = tk.Tk()
 		self.PersonalFinanceManager.title('Personal Finance Manager')
@@ -888,6 +905,7 @@ class FinanceGUI:
 		FinanceProjectDatabaseAccess.DeleteBudget(BudgetToDelete)
 		self.RepopulateBudgetDropboxes()
 		self.ResetBudgetTree('event')
+		self.BudgetToDeleteDropdown.set('')
 
 
 	def ShowBudgetAllocationAmount(self,event):

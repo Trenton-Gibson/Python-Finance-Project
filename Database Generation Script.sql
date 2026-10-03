@@ -40,6 +40,7 @@ CREATE TABLE "Budget_Item" (
 );
 CREATE TABLE "Budget" (
 	"BudgetID"	INTEGER NOT NULL UNIQUE,
+	"Budget_Amount"	NUMERIC NOT NULL,
 	"Budget_Name"	TEXT NOT NULL,
 	"Budget_Note"	TEXT NOT NULL,
 	PRIMARY KEY("BudgetID" AUTOINCREMENT)
