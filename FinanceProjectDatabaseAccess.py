@@ -547,7 +547,7 @@ if os.path.isfile(DIR_PATH):
 			# the program crashing.
 			BudgetStats=GetBudgetInfo(BudgetName)
 			BudgetAmount=BudgetStats[0]
-			BudgetAmount=float(BudgetAmount[3])
+			BudgetAmount=float(BudgetAmount[1])
 			BudgetItems=GetBudgetItems(BudgetName)
 			BudgetItems.append(['','','',BudgetAllocationType,BudgetAllocationAmount])
 			AllocatedFunds=float()

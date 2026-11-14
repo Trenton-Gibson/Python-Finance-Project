@@ -7,6 +7,8 @@ Make Transfer Date have separate fields
 have place to show budget description
 Hide budget amount label in account management when not applicable
 ## Bug Fixes
+RESOLVE ERROR WITH CREATING BUDGET ITEMS
+
 Make sure that the fixed parts of income and percentage parts of income can be
 paid to the logical accounts without exceeding the income amount
 

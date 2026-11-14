@@ -41,7 +41,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical",
-                "autoReveal": false
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
               },
               "icon": "lucide-folder-closed",
               "title": "Files"
@@ -74,13 +76,11 @@
               "title": "Bookmarks"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "right": {
     "id": "b0b774f627693869",
@@ -187,7 +187,8 @@
   },
   "active": "7d202ece3c7c505e",
   "lastOpenFiles": [
-    "Welcome.md",
-    "Development To-Do-List.md"
+    "Have the ability to create budgets.md",
+    "Development To-Do-List.md",
+    "Welcome.md"
   ]
 }
