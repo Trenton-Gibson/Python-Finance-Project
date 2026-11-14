@@ -822,7 +822,7 @@ class FinanceGUI:
 
 
 	def AddBudgetItem(self):
-		# try:
+		try:
 			BudgetName=self.BudgetEditingDropdown.get()
 			LogicalAccountName=self.EditBudgetLogicalDropdown.get()
 			BudgetAllocationType=self.BudgetAllocationTypeDropdown.get()
@@ -835,11 +835,11 @@ class FinanceGUI:
 			self.BudgetAllocationAmountField.delete(0, END)
 			self.BudgetItemNoteField.delete(0, END)
 			self.ResetBudgetStats()
-		# except:
-		# 			#Create an error message variable
-		# 			self.ErrorMessage ='Error! Follow the directions and please try again.'
-		# 			#Display the error message in an info dialog box.
-		# 			tk.messagebox.showinfo('Error!', self.ErrorMessage)
+		except:
+					#Create an error message variable
+					self.ErrorMessage ='Error! Follow the directions and please try again.'
+					#Display the error message in an info dialog box.
+					tk.messagebox.showinfo('Error!', self.ErrorMessage)
 
 
 	def ResetBudgetStats(self):
