@@ -789,6 +789,8 @@ class FinanceGUI:
 
 	def CreateBudget(self):
 		BudgetName=self.BudgetNameField.get()
+		BudgetName=BudgetName.rstrip()
+		BudgetName=BudgetName.lstrip()
 		BudgetAmount=self.BudgetAmountField.get()
 		BudgetDescription=self.BudgetDescriptionField.get()
 		FinanceProjectDatabaseAccess.AddBudget(BudgetName,BudgetAmount,BudgetDescription)
