@@ -43,9 +43,8 @@ class FinanceGUI:
 			conn.commit()
 			# Close the connection when done
 			conn.close()
-			print("done")
 		else:
-			print("yeet")
+			pass
 		# Create Personal Finance Manager window, maximize the window, and create universal styles
 		self.PersonalFinanceManager = tk.Tk()
 		self.PersonalFinanceManager.title('Personal Finance Manager')
@@ -170,7 +169,7 @@ class FinanceGUI:
 		self.BudgetStatsLabel=tk.Label(self.EditBudgetFrame,
 			text="Total Budget Allocation:      Unallocated Funds:           Percentage of Funds Unallocated:        Funds Allocated to the Remainder:")
 		self.DeleteItemButtonTutorial=tk.Label(self.EditBudgetFrame,
-			text="If you wish to delete a budget item, click on said budget item in the viewing table and press the Delete Budget Item button to remove the unvwanted budget item.")
+			text="If you wish to delete a budget item, click on said budget item in the viewing table and press the Delete Budget Item button to remove the unwanted budget item.")
 		self.DeleteItemButton=tk.Button(self.EditBudgetFrame, text="Delete Budget Item", command=self.DeleteBudgetItem)
 		## Add widgets to Edit Budget Frame
 		self.BudgetEditingAndViewingLabel.grid(row=0,column=0,columnspan=3)
@@ -853,7 +852,7 @@ class FinanceGUI:
 			# data for a row in the Budget table.
 			BudgetStats=FinanceProjectDatabaseAccess.GetBudgetInfo(BudgetName)
 			BudgetAmount=BudgetStats[0]
-			BudgetAmount=float(BudgetAmount[3])
+			BudgetAmount=float(BudgetAmount[1])
 			BudgetItems=FinanceProjectDatabaseAccess.GetBudgetItems(BudgetName)
 			AllocatedFunds=float()
 			FundsInRemainder=float()
@@ -906,6 +905,9 @@ class FinanceGUI:
 		self.RepopulateBudgetDropboxes()
 		self.ResetBudgetTree('event')
 		self.BudgetToDeleteDropdown.set('')
+		self.BudgetEditingDropdown.delete(0,END)
+		self.BudgetDropdown.delete(0,END)
+		self.BudgetToDeleteDropdown.delete(0,END)
 
 
 	def ShowBudgetAllocationAmount(self,event):
