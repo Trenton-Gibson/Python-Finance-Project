@@ -203,8 +203,6 @@ class FinanceGUI:
 		self.CreateAccountLabel = tk.Label(self.AddAccountFrame,text='Account Creation')
 		self.NameAccountLabel = tk.Label(self.AddAccountFrame, text='Account Name')
 		self.NameAccountEntry = tk.Entry(self.AddAccountFrame)
-		self.IntialBalanceLabel = tk.Label(self.AddAccountFrame,text='Intial Balance')
-		self.IntialBalanceEntry = tk.Entry(self.AddAccountFrame)
 		self.AccountNoteLabel = tk.Label(self.AddAccountFrame,text='Account Description')
 		self.AccountNoteEntry = tk.Entry(self.AddAccountFrame)
 		self.ChooseAccountCategoryLabel = tk.Label(self.AddAccountFrame,text='Account Category')
@@ -214,13 +212,11 @@ class FinanceGUI:
 		self.CreateAccountLabel.grid(row=0,column=0, columnspan=2,padx=10)
 		self.NameAccountLabel.grid(row=1, column=0,padx=10)
 		self.NameAccountEntry.grid(row=1, column=1,padx=10)
-		self.IntialBalanceLabel.grid(row=2, column=0,padx=10)
-		self.IntialBalanceEntry.grid(row=2, column=1, padx=10)
-		self.AccountNoteLabel.grid(row=3, column=0, padx=10)
-		self.AccountNoteEntry.grid(row=3, column=1, padx=10)
-		self.ChooseAccountCategoryLabel.grid(row=4, column=0, padx=10)
-		self.ChooseAccountCategoryDropbox.grid(row=4, column=1, padx=10)
-		self.CreateAccountButton.grid(row=5, column=0, columnspan=2, ipadx=10)
+		self.AccountNoteLabel.grid(row=2, column=0, padx=10)
+		self.AccountNoteEntry.grid(row=2, column=1, padx=10)
+		self.ChooseAccountCategoryLabel.grid(row=3, column=0, padx=10)
+		self.ChooseAccountCategoryDropbox.grid(row=3, column=1, padx=10)
+		self.CreateAccountButton.grid(row=4, column=0, columnspan=2, ipadx=10)
 		## Create Delete Account Frame Widgets
 		self.DeleteAccountLabel=tk.Label(self.DeleteAccountFrame, text='Account Deletion')
 		self.AccountToDeleteLabel=tk.Label(self.DeleteAccountFrame, text='Account to Delete')
@@ -474,12 +470,10 @@ class FinanceGUI:
 		try:
 			#get data from the entries to create a new account
 			self.AccountName = self.NameAccountEntry.get()
-			self.IntialBalance = self.IntialBalanceEntry.get()
-			self.IntialBalance = float(self.IntialBalance)
 			self.AccountDescription = self.AccountNoteEntry.get()
 			self.AccountCategory = self.ChooseAccountCategoryDropbox.get()
 			# If any of the entries are unpopulated, it sends an error message and the core code isn't executed
-			if self.AccountName == '' or self.IntialBalance == '' or self.AccountCategory == '':
+			if self.AccountName == '' or self.AccountCategory == '':
 				# Create an error message variable
 				self.ErrorMessage = 'Error! Follow the directions and please try again.'
 				# Display the error message in an info dialog box.
@@ -487,12 +481,11 @@ class FinanceGUI:
 			#The core code
 			else:
 				#Add Account Function is called from the other module to interact with the database
-				FinanceProjectDatabaseAccess.AddAccount(self.IntialBalance, self.AccountName, self.AccountDescription, self.AccountCategory)
+				FinanceProjectDatabaseAccess.AddAccount(0, self.AccountName, self.AccountDescription, self.AccountCategory)
 				# Repopulate treeviews with data
 				self.RepopulateAccountsTreeview()
 				self.RepopulateTransactionsTreeview()
 				self.NameAccountEntry.delete(0,END)
-				self.IntialBalanceEntry.delete(0,END)
 				self.AccountNoteEntry.delete(0,END)
 				self.ChooseAccountCategoryDropbox.delete(0,END)
 				self.RepopulateAccountDropboxes()
