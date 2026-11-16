@@ -908,7 +908,7 @@ class FinanceGUI:
 	def ShowBudgetAllocationAmount(self,event):
 		BudgetChoice=self.IncomeBudgetDropdownChoice.get()
 		BudgetData=FinanceProjectDatabaseAccess.GetBudgetInfo(BudgetChoice)
-		BudgetAmount=BudgetData[0][3]
+		BudgetAmount=BudgetData[0][1]
 		self.BudgetAmountLabel.config(text="Budget Amount: "+BudgetAmount)
 
 # Call the Finance GUI Class
